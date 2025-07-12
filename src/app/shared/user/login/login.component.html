@@ -1,0 +1,140 @@
+<ion-card [ngClass]="{'base-card': !isSmall}" style="height: fit-content">
+	<ion-card-header *ngIf="!isSmall">
+		<ion-card-title>Login / Register</ion-card-title>
+	</ion-card-header>
+	<ion-card-content [style.height]="isSmall ? '30vh' : '44vh'">
+		<ion-tabs>
+			<ion-tab-bar slot="top" [ngClass]="{'small-tab-bar': isSmall}">
+				<ion-tab-button tab="third-party-credentials" [ngClass]="{'small-tab-button': isSmall}">
+					<ion-icon name="key-outline" [size]="isSmall?'small':''"></ion-icon>
+					{{isSmall ? '' : '3d party'}}
+				</ion-tab-button>
+				<ion-tab-button tab="email-login" [ngClass]="{'small-tab-button': isSmall}">
+					<ion-icon name="log-in-outline" [size]="isSmall?'small':''"></ion-icon>
+					{{isSmall ? '' : 'Login'}}
+				</ion-tab-button>
+				<ion-tab-button tab="email-register" [ngClass]="{'small-tab-button': isSmall}">
+					<ion-icon name="person-add-outline" [size]="isSmall?'small':''"></ion-icon>
+					{{isSmall ? '' : 'Register'}}
+				</ion-tab-button>
+				<ion-tab-button *ngIf="!isSmall" tab="email-recovery" [ngClass]="{'small-tab-button': isSmall}">
+					<ion-icon name="refresh-circle-outline" [size]="isSmall?'small':''"></ion-icon>
+					{{isSmall ? '' : 'Recover'}}
+				</ion-tab-button>
+			</ion-tab-bar>
+
+			<!-- THIRD PARTY CREDENTIALS -->
+			<ion-tab tab="third-party-credentials">
+				<ion-card id="third-party-credentials-page">
+					<ion-title>
+						Use a Third-party credential
+					</ion-title>
+					<ion-card-content>
+						<ion-button (click)="loginWithGoogle()" icon-right expand="block" fill="outline" shape="round"
+							color="primary">
+							<ion-icon slot="icon-only" size="large" name="logo-google" ios="logo-google"
+								md="logo-google"></ion-icon>
+							Google
+						</ion-button>
+					</ion-card-content>
+				</ion-card>
+			</ion-tab>
+
+			<!-- Email Login/Register -->
+			<ion-tab tab="email-login">
+				<ion-card>
+					<ion-card-header>
+						<ion-card-title>Login</ion-card-title>
+						<ion-card-subtitle *ngIf="!isSmall">Already have an account ?</ion-card-subtitle>
+					</ion-card-header>
+					<ion-card-content>
+						<form [formGroup]="loginForm"
+							(ngSubmit)="loginForm.valid && login(loginForm.controls['email'].value, loginForm.controls['password'].value)"
+							novalidate>
+							<ion-item>
+								<ion-input placeholder="email" formControlName="email"></ion-input>
+								<ion-label
+									*ngIf="loginForm.controls['email'].invalid && (loginForm.controls['email'].dirty || loginForm.controls['email'].touched)"
+									color="danger" [style.font-size]="isSmall ? '0.5em' : '0.8em'">
+									Invalid format
+								</ion-label>
+							</ion-item>
+							<ion-item>
+								<ion-input type="password" placeholder="password"
+									formControlName="password"></ion-input>
+								<ion-label
+									*ngIf="loginForm.controls['password'].invalid && (loginForm.controls['password'].dirty || loginForm.controls['password'].touched)"
+									color="danger" [style.font-size]="isSmall ? '0.5em' : '0.8em'">
+									Min length 8
+								</ion-label>
+							</ion-item>
+							<ion-button [disabled]="!loginForm.valid" expand="block" type="submit">
+								Login
+							</ion-button>
+						</form>
+					</ion-card-content>
+				</ion-card>
+			</ion-tab>
+
+			<ion-tab tab="email-register">
+				<ion-card>
+					<ion-card-header>
+						<ion-card-title>Register</ion-card-title>
+						<ion-card-subtitle *ngIf="!isSmall">Don't have an account ?</ion-card-subtitle>
+					</ion-card-header>
+					<ion-card-content>
+						<form [formGroup]="registerForm"
+							(ngSubmit)="register(registerForm.controls['email'].value, registerForm.controls['password'].value)">
+							<ion-item>
+								<ion-input placeholder="email" formControlName="email"></ion-input>
+								<ion-label
+									*ngIf="registerForm.controls['email'].invalid && (registerForm.controls['email'].dirty || registerForm.controls['email'].touched)"
+									color="danger" [style.font-size]="isSmall ? '0.5em' : '0.8em'">
+									Invalid format
+								</ion-label>
+							</ion-item>
+							<ion-item>
+								<ion-input type="password" placeholder="password"
+									formControlName="password"></ion-input>
+								<ion-label
+									*ngIf=" registerForm.controls['password'].invalid && (registerForm.controls['password'].dirty || registerForm.controls['password'].touched)"
+									color="danger" [style.font-size]="isSmall ? '0.5em' : '0.8em'">
+									Min length 8
+								</ion-label>
+							</ion-item>
+							<ion-button [disabled]="!registerForm.valid" expand="block" type="submit">
+								Register
+							</ion-button>
+						</form>
+					</ion-card-content>
+				</ion-card>
+			</ion-tab>
+
+			<!-- Recover Email -->
+			<ion-tab tab="email-recovery">
+				<ion-card>
+					<ion-card-header>
+						<ion-card-title>Reset password with e-mail</ion-card-title>
+						<ion-card-subtitle *ngIf="!isSmall">Forgot your password ?</ion-card-subtitle>
+					</ion-card-header>
+					<ion-card-content>
+						<form [formGroup]="passwordRecoveryForm"
+							(ngSubmit)="passwordRecovery(passwordRecoveryForm.controls['email'].value)">
+							<ion-item>
+								<ion-input placeholder="email" formControlName="email"></ion-input>
+								<ion-label
+									*ngIf="passwordRecoveryForm.controls['email'].invalid && (passwordRecoveryForm.controls['email'].dirty || passwordRecoveryForm.controls['email'].touched)"
+									color="danger">
+									Invalid format
+								</ion-label>
+							</ion-item>
+							<ion-button [disabled]="!passwordRecoveryForm.valid" expand="block" type="submit">
+								Reset my password
+							</ion-button>
+						</form>
+					</ion-card-content>
+				</ion-card>
+			</ion-tab>
+		</ion-tabs>
+	</ion-card-content>
+</ion-card>

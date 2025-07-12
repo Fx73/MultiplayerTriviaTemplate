@@ -1,0 +1,27 @@
+ion-content{
+    --background: 
+    linear-gradient(rgba(155,112,112,0.8), rgba(112,112,112,0.4))}
+
+.home-content{
+  --border-radius : 20px;
+  --border-style: solid;
+  --border-width: 1px;
+  --box-shadow: 10px 10px 5px rgb(0, 0, 0);
+  margin: 1vh;
+  font-weight: bolder;
+  color: #020f1fdc;
+  height: 1.4em;
+
+}
+
+.welcome-start-card{
+  background:     linear-gradient(rgba(255, 212, 212, 0.8), rgba(252, 30, 30, 0.4));
+}
+.welcome-start-card2{
+  background:     linear-gradient(rgba(255, 212, 162, 0.8), rgba(252, 30, 162, 0.4));
+}
+.welcome-start-card:hover {
+  opacity: 0.8;
+  filter: blur(1px) contrast(110%);
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.3);
+}

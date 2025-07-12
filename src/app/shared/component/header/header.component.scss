@@ -1,0 +1,18 @@
+.main-title {
+  font-size: max(2em,6vw);
+  font-family: "Coiny", system-ui;
+  min-height: 1em;
+  max-height: 2em;
+  height: 8vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logoImg{
+  margin: 1vw;
+  min-height: 4em;
+  max-height: 8em;
+  height:8vw;
+  cursor: pointer;
+}

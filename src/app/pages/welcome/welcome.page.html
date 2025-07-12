@@ -1,0 +1,63 @@
+<app-header title="MultiTriviaTemplate"></app-header>
+<ion-content>
+	<ion-grid>
+		<ion-row>
+			<ion-col size="8">
+				<ion-card class="base-card">
+					<ion-card-header>
+						<ion-card-title class="home-fontsize">
+							Welcome on MultiPlayer Trivia Template
+						</ion-card-title>
+					</ion-card-header>
+					<ion-card-content>
+						<ion-card-header>
+							<ion-card class="base-card start-card welcome-start-card"
+								[routerLink]="['/play/player-selection']">
+								Start Game
+							</ion-card>
+						</ion-card-header>
+						<ion-card-content>
+							<ion-card class="base-card start-card welcome-start-card2"
+								[routerLink]="['/lobby',gameCode]" [disabled]="gameCodeInput.invalid">
+								Join Game
+							</ion-card>
+							<ion-card>
+								<ion-card-header><ion-card-title>Enter Code to join :</ion-card-title></ion-card-header>
+								<ion-card-content [style.background]="'white'">
+									<ion-input #gameCodeInput="ngModel" [(ngModel)]="gameCode" minlength="6"
+										placeholder="Code Here" maxlength="6"
+										required></ion-input></ion-card-content></ion-card>
+						</ion-card-content>
+					</ion-card-content>
+				</ion-card>
+			</ion-col>
+			<ion-col size="4">
+				<ion-card class="base-card">
+					<ion-card-header>
+						<ion-card-title>{{ userData?.name ?? "Anonymous user" }} </ion-card-title>
+						<ion-card-subtitle *ngIf="!userData"> Log in to upload your questions</ion-card-subtitle>
+					</ion-card-header>
+					<ion-card-content>
+						<ion-button *ngIf="userData" [routerLink]="['/user-profile']" [disabled]="!isUserLoggedIn()"
+							expand="block" size="small" class="home-content">
+							My Profile
+						</ion-button>
+						<ion-button [routerLink]="['/browse-upload']" [disabled]="!isUserLoggedIn()" expand="block"
+							class="home-content">
+							Content browser
+						</ion-button>
+						<ion-button [routerLink]="['/options']" expand="block" size="small" class="home-content"
+							color="dark">
+							Options
+						</ion-button>
+						<ion-button [routerLink]="['/about']" expand="block" size="small" class="home-content"
+							color="dark">
+							Help
+						</ion-button>
+					</ion-card-content>
+				</ion-card>
+				<app-login *ngIf="userData === null" [isSmall]="false"></app-login>
+			</ion-col>
+		</ion-row>
+	</ion-grid>
+</ion-content>

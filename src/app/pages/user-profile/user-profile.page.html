@@ -1,0 +1,24 @@
+<app-header>Your profile</app-header>
+<ion-content [fullscreen]="true">
+  <div class="card-grid">
+    <ion-card class="user-profile-card base-card">
+      <ion-card-header>
+        <ion-card-title>Account informations</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <app-account></app-account>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="user-profile-card base-card">
+      <ion-card-header>
+        <ion-card-title>{{ userData.name }}</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <ion-img *ngIf="userData.avatar" [src]="userData.avatar" class="img-avatar">
+        </ion-img>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

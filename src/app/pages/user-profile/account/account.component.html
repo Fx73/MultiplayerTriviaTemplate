@@ -1,0 +1,35 @@
+<ion-card>
+	<ion-item>
+		<ion-input [(ngModel)]="name" name="name" type="text" placeholder="Name" required></ion-input>
+	</ion-item>
+	<ion-item>
+		<ion-input [(ngModel)]="email" name="email" type="email" placeholder="your@email.com" required></ion-input>
+	</ion-item>
+	<ion-button (click)="saveProfile()" expand="block">
+		Change personal informations
+	</ion-button>
+</ion-card>
+
+<ion-card>
+	<ion-item>
+		<ion-input [(ngModel)]="this.password" name="password" type="password" placeholder="Password"
+			required></ion-input>
+	</ion-item>
+	<ion-item>
+		<ion-input [(ngModel)]="this.password2" name="confirm" type="password" placeholder="Password again"
+			required></ion-input>
+	</ion-item>
+	<ion-button (click)="savePassword()" expand="block">
+		Change password
+	</ion-button>
+</ion-card>
+
+<ion-card>
+	<ion-button [color]="isEmailVerified?'success':'warning'" [disabled]="isEmailVerified" (click)="resendEmail()"
+		expand="block">
+		{{isEmailVerified?'Email verified':'Resend verification email'}}
+	</ion-button>
+	<ion-button (click)="logOut()" color="tertiary" expand="block">
+		Log Out
+	</ion-button>
+</ion-card>

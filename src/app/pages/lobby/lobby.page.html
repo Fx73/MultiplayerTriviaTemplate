@@ -1,0 +1,52 @@
+<app-header title="Welcome into the Lobby"></app-header>
+<ion-content [fullscreen]="true">
+	<ion-grid>
+		<ion-row>
+			<ion-col>
+				<ion-card class="cardContainer">
+					<ion-card-header>
+						<ion-card-title>Your lobby code :</ion-card-title>
+						<ion-input [value]="lobbyCode" aria-label="Code" labelPlacement="stacked" fill="outline"
+							style="text-transform: uppercase;" readonly></ion-input>
+						<ion-icon (click)="copyToClipboard()" size="large" class="lobbyCodeItem"
+							name="clipboard"></ion-icon>
+						<ion-card-title>Set your name !</ion-card-title>
+						<ion-input [(ngModel)]="username" label="You are :" fill="outline" label-placement="floating">
+						</ion-input>
+						<ion-button (click)="updateName()" class="okBtn">
+							OK
+						</ion-button>
+					</ion-card-header>
+					<ion-card-content>
+						<app-players-card></app-players-card>
+					</ion-card-content>
+				</ion-card>
+			</ion-col>
+			<ion-col>
+				<ion-card class="cardContainer">
+					<ion-card-header>
+						<ion-card-title>Categories</ion-card-title>
+					</ion-card-header>
+					<ion-card-content class="cardListCentered">
+						<ion-card *ngIf="categoryPicked" class="basicCard" color="secondary">
+							<ion-card-content>
+								<ion-text>
+									{{categoryPicked}}
+								</ion-text>
+							</ion-card-content>
+						</ion-card>
+
+						<ion-button [disabled]="!isMaster" size="large" fill="outline" expand="block">
+							Launch
+						</ion-button>
+					</ion-card-content>
+				</ion-card>
+			</ion-col>
+			<ion-col>
+				<ion-card class="cardContainer">
+
+				</ion-card>
+			</ion-col>
+		</ion-row>
+	</ion-grid>
+</ion-content>

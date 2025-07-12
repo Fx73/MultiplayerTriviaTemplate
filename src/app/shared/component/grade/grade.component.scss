@@ -1,0 +1,35 @@
+.grade-box {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    border-radius: 0;
+    border: 2px solid;
+    font-size: 1.6rem;
+    font-weight: bolder;
+    font-family: "Coiny", system-ui;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+    background-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 2px 2px 2px 2px black;
+    span {
+        position: absolute;
+        left: 20%;
+        top: -30%;
+    }
+    span:nth-child(1) {
+        transform: translate(0,0);
+    }
+    span:nth-child(2) {
+        transform: translate(-0.6rem, 0);
+    }
+    span:nth-child(3) {
+        transform: translate(0.6rem, 0);
+    }
+
+  }
+
+  .score-box{
+    z-index: 1;
+    margin-left: 5px;
+    background-color: transparent;
+    border: 1px solid;
+  }

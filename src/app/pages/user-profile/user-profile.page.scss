@@ -1,0 +1,31 @@
+.user-profile-card {
+    opacity: 0.9;
+    background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-tertiary));
+    color: white;
+    transition: transform 1s ease-in-out;
+  }
+  
+  .user-profile-card:hover {
+    opacity: 1;
+    //background: linear-gradient(135deg, var(--ion-color-tertiary), var(--ion-color-primary));
+  }
+  
+  .user-profile-card ion-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .user-profile-card ion-item {
+    background: rgba(255, 255, 255, 0.1);
+    --background: transparent;
+    border-radius: 8px;
+    padding: 8px;
+  }
+  
+  .img-avatar{
+    max-width: 150px;
+    max-height: 150px;
+    object-fit: cover; 
+    border-radius: 50%;
+  }

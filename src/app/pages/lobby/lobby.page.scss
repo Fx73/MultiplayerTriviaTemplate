@@ -1,0 +1,87 @@
+@import '/src/theme/components.scss';
+
+hr {
+  margin-top: 4px;
+  border-top: 1px double #777777;
+  width: 40%;
+}
+
+ion-col{
+  padding: 0;
+}
+
+.cardContainer{
+  padding: 2px;
+  margin: 6px;
+}
+
+.okBtn{
+  position: relative;
+  top: -52px;
+  margin-bottom: -52px;
+  width: 40px;
+  height: 40px;
+  align-self: flex-end;
+  right: 4px;
+  z-index: 2;
+}
+
+.cardListGrid {
+  @extend .cardList;
+  display: grid;
+  justify-content: center;
+  align-items: center;
+}
+
+.cardListCentered{
+  @extend .cardList;
+  display:grid;
+  align-items: center;
+  justify-content: center;
+}
+
+.scrollBlock{
+  overflow-y: scroll;
+  max-height: 60vh ;
+}
+
+.lobbyCodeItem{
+    position: absolute;
+    right: 25px;
+    top:50px;
+    z-index: 2;
+    cursor: pointer;
+
+}
+
+
+ion-radio::part(container) {
+  width: 30px;
+  height: 30px;
+  margin-right: 8px;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+}
+
+ion-radio::part(mark) {
+  background: none;
+  transition: none;
+  transform: none;
+  border-radius: 0;
+}
+
+ion-radio.radio-checked::part(container) {
+  background: #6815ec;
+  border-color: transparent;
+}
+
+ion-radio.radio-checked::part(mark) {
+  width: 6px;
+  height: 10px;
+
+  border-width: 0px 2px 2px 0px;
+  border-style: solid;
+  border-color: #fff;
+
+  transform: rotate(45deg);
+}

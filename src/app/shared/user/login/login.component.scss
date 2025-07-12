@@ -1,0 +1,25 @@
+ion-modal {
+  --height:fit-content;
+  --border-radius: 16px;
+}
+
+.recoveryText{
+  text-align: right;
+  color: #888;
+  font-size: smaller;
+  font-style: italic;
+  cursor: pointer;
+}
+
+ion-tab{
+  ion-card{
+    margin: 4px 0;
+  }
+}
+.small-tab-bar{
+  height: 20px;
+}
+
+.small-tab-button{
+  height: 16px;
+}

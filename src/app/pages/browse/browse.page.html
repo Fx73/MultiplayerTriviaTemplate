@@ -1,0 +1,34 @@
+<app-header title="Browse"></app-header>
+<ion-content fullscreen="false">
+  <ion-split-pane when="xs" contentId="item-list">
+    <ion-menu contentId="item-list">
+      <ion-card *ngIf="selectedItem" class="levelCard">
+        <ion-card-header>
+          <ion-card-title> {{ selectedItem.name }} </ion-card-title>
+          <ion-card-subtitle> </ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+        </ion-card-content>
+      </ion-card>
+    </ion-menu>
+    <div id="item-list">
+      <ion-searchbar [debounce]="1000" (ionInput)="onSearch($event)" show-clear-button="focus"
+        style="background-color:white"></ion-searchbar>
+      <div class="cardList">
+        <!-- Music cards -->
+        <ion-card *ngFor="let item of items" (click)="select(item)" class="basicCard"
+          [ngClass]="item?.id === item.id ? 'selectedCard' : ''">
+          <ion-card-header>
+            <ion-card-title>{{ item.name }}</ion-card-title>
+            <ion-card-subtitle></ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content class="basicCardContent">
+          </ion-card-content>
+        </ion-card>
+      </div>
+      <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+        <ion-infinite-scroll-content></ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+    </div>
+  </ion-split-pane>
+</ion-content>
