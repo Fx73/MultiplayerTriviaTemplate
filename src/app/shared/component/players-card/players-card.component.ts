@@ -3,7 +3,7 @@ import { NgFor, NgIf } from '@angular/common';
 import { removeOutline, star } from 'ionicons/icons';
 
 import { IonicModule } from '@ionic/angular';
-import { Player } from 'src/app/pages/game/player';
+import { Player } from 'src/app/shared/DTO/player';
 import { addIcons } from 'ionicons';
 
 @Component({

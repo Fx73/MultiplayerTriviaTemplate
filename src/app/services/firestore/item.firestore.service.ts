@@ -3,7 +3,7 @@ import { Firestore, addDoc, collection, deleteDoc, deleteField, doc, documentId,
 import { AppComponent } from 'src/app/app.component';
 import { FirestoreConverter } from './firestore.converter';
 import { Injectable } from '@angular/core';
-import { TriviaItemDTO } from 'src/app/DTO/trivia-item.dto';
+import { TriviaItemDTO } from 'src/app/shared/DTO/trivia-item.dto';
 import { UserFirestoreService } from './user.firestore.service';
 
 @Injectable({
@@ -34,6 +34,12 @@ export class ItemFirestoreService {
             await setDoc(itemRef, dto);
 
             AppComponent.presentOkToast("Music successfully uploaded!")
+
+            if (dto.category) {
+                this.addCategory(dto.category);
+                if (dto.subcategory)
+                    this.addSubcategory(dto.category, dto.subcategory);
+            }
         } catch (error) {
             AppComponent.presentWarningToast("Error uploading music: " + error)
             throw error;
@@ -46,9 +52,32 @@ export class ItemFirestoreService {
             if (!userId) throw new Error("User not authenticated");
 
             const itemRef = doc(this.db, this.TRIVIA_COLLECTION, dto.id).withConverter(this.firestoreConverterTriviaItem);
+            const oldSnap = await getDoc(itemRef);
+            const oldData = oldSnap.data();
+
             await setDoc(itemRef, dto);
 
             AppComponent.presentOkToast("Item successfully updated!");
+
+            // 🔍 Category
+            const oldCat = oldData?.category;
+            const newCat = dto.category;
+
+            const oldSub = oldData?.subcategory;
+            const newSub = dto.subcategory;
+
+            if (newCat) {
+                this.addCategory(newCat);
+                if (newSub) this.addSubcategory(newCat, newSub);
+            }
+
+            if (oldCat && oldCat !== newCat) {
+                this.removeCategory(oldCat);
+            }
+
+            if (oldCat && oldSub && (oldSub !== newSub || oldCat !== newCat)) {
+                this.removeSubcategory(oldCat, oldSub);
+            }
         } catch (error) {
             AppComponent.presentWarningToast("Error updating item: " + error);
             throw error;
@@ -181,13 +210,30 @@ export class ItemFirestoreService {
     async deleteItem(itemId: string): Promise<void> {
         try {
             const itemRef = doc(this.db, this.TRIVIA_COLLECTION, itemId);
+            const itemSnap = await getDoc(itemRef);
+
+            if (!itemSnap.exists()) {
+                throw new Error('Item not found');
+            }
+
+            const itemData = itemSnap.data();
+            const category = itemData['category'];
+            const subcategory = itemData['subcategory'];
+
             await deleteDoc(itemRef);
             AppComponent.presentOkToast("Item successfully deleted!");
+
+            if (category) {
+                if (subcategory)
+                    this.removeSubcategory(category, subcategory);
+                this.removeCategory(category);
+            }
         } catch (error) {
-            AppComponent.presentErrorToast("Error deleting music: " + error);
+            AppComponent.presentErrorToast("Error deleting item: " + error);
             throw error;
         }
     }
+
 
     //#endregion
 

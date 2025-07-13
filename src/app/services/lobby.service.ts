@@ -2,8 +2,8 @@ import { DocumentReference, Firestore, collection, deleteDoc, doc, getDoc, getDo
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 
 import { Injectable } from '@angular/core';
-import { Lobby } from '../pages/game/lobby';
-import { Player } from '../pages/game/player';
+import { Lobby } from '../shared/DTO/lobby';
+import { Player } from '../shared/DTO/player';
 import { UserConfigService } from 'src/app/services/userconfig.service';
 import { UserFirestoreService } from './firestore/user.firestore.service';
 import { WelcomePage } from '../pages/welcome/welcome.page';
@@ -112,28 +112,17 @@ export class LobbyService {
   }
 
 
-  async selectCategory(lobbyCode: string, category: string): Promise<void> {
+  async updateLobby(lobbyCode: string, key: string, value: any): Promise<void> {
     const lobbyRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode);
-
     const snap = await getDoc(lobbyRef);
+
     if (!snap.exists()) {
       throw new Error('Lobby does not exist');
     }
 
-    await updateDoc(lobbyRef, { selectedCategory: category });
+    await updateDoc(lobbyRef, { [key]: value });
   }
 
-
-  async selectSubcategory(lobbyCode: string, subcategory: string): Promise<void> {
-    const lobbyRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode);
-
-    const snap = await getDoc(lobbyRef);
-    if (!snap.exists()) {
-      throw new Error('Lobby does not exist');
-    }
-
-    await updateDoc(lobbyRef, { selectedSubcategory: subcategory });
-  }
 
 
   async leaveLobby(lobbyCode: string): Promise<void> {

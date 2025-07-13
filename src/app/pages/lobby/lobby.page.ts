@@ -7,9 +7,9 @@ import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from 'src/app/shared/component/header/header.component';
 import { IonicModule } from '@ionic/angular';
 import { ItemFirestoreService } from 'src/app/services/firestore/item.firestore.service';
-import { Lobby } from '../game/lobby';
+import { Lobby } from '../../shared/DTO/lobby';
 import { LobbyService } from 'src/app/services/lobby.service';
-import { Player } from '../game/player';
+import { Player } from '../../shared/DTO/player';
 import { PlayersCardComponent } from 'src/app/shared/component/players-card/players-card.component';
 import { UserConfigService } from 'src/app/services/userconfig.service';
 import { addIcons } from 'ionicons';
@@ -36,6 +36,7 @@ export class LobbyPage implements OnInit {
 
   categoryPicked: string | null = null;
   subcategoryPicked: string | null = null;
+  questionCount: number = 10;
 
   isOwner: boolean = false
 
@@ -84,6 +85,7 @@ export class LobbyPage implements OnInit {
       this.players = list;
     });
 
+    this.categoryList = await this.itemService.getCategories()
   }
 
   ionViewWillLeave() {
@@ -101,6 +103,18 @@ export class LobbyPage implements OnInit {
     this.lobbyService.changePlayerName(this.lobbyCode, this.playerName)
   }
 
+
+  async onCategorySelect() {
+    await this.lobbyService.updateLobby(this.lobbyCode, 'category', this.categoryPicked)
+    if (this.categoryPicked)
+      this.subcategoryList = await this.itemService.getSubcategories(this.categoryPicked)
+  }
+  async onSubcategorySelect() {
+    await this.lobbyService.updateLobby(this.lobbyCode, 'subcategory', this.subcategoryPicked)
+  }
+  async onQuestionCountChange() {
+    await this.lobbyService.updateLobby(this.lobbyCode, 'questionCount', this.questionCount)
+  }
 
   copyToClipboard() {
     navigator.clipboard.writeText("https://" + window.location.hostname + this.router.url);

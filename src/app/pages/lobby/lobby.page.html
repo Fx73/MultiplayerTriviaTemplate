@@ -29,15 +29,35 @@
 						<ion-card-title>Categories</ion-card-title>
 					</ion-card-header>
 					<ion-card-content class="cardListCentered">
-						<ion-card *ngIf="categoryPicked" class="basicCard" color="secondary">
-							<ion-card-content>
-								<ion-text>
-									{{categoryPicked}}
-								</ion-text>
-							</ion-card-content>
-						</ion-card>
+						<ion-item>
+							<ion-label position="stacked">Question number</ion-label>
+							<ion-input type="number" [(ngModel)]="questionCount" (ionBlur)="onQuestionCountChange()"
+								placeholder="ex: 10" min="1" max="50" inputmode="numeric">
+							</ion-input>
+						</ion-item>
 
-						<ion-button [disabled]="!isOwner" size="large" fill="outline" expand="block">
+						<ion-item>
+							<ion-label>Catégorie</ion-label>
+							<ion-select [(ngModel)]="categoryPicked" (ionChange)="onCategorySelect()"
+								interface="popover">
+								<ion-select-option [value]="null">Aucune</ion-select-option>
+								<ion-select-option *ngFor="let cat of categoryList" [value]="cat">
+									{{ cat }}
+								</ion-select-option>
+							</ion-select>
+						</ion-item>
+						<ion-item *ngIf="categoryPicked">
+							<ion-label>Sous-catégorie</ion-label>
+							<ion-select [(ngModel)]="subcategoryPicked" interface="popover"
+								(ionChange)="onSubcategorySelect()">
+								<ion-select-option [value]="null">Aucune</ion-select-option>
+								<ion-select-option *ngFor="let sub of subcategoryList" [value]="sub">
+									{{ sub }}
+								</ion-select-option>
+							</ion-select>
+						</ion-item>
+						<ion-button [disabled]="!isOwner" size="large" fill="outline" expand="block"
+							style="margin-top: 10px;">
 							Launch
 						</ion-button>
 					</ion-card-content>
