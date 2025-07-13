@@ -1,4 +1,4 @@
-import { Firestore, addDoc, collection, deleteDoc, doc, documentId, getDoc, getDocs, getFirestore, limit, orderBy, query, setDoc, startAfter, updateDoc, where } from 'firebase/firestore';
+import { Firestore, addDoc, collection, deleteDoc, deleteField, doc, documentId, getDoc, getDocs, getFirestore, limit, orderBy, query, setDoc, startAfter, updateDoc, where } from 'firebase/firestore';
 
 import { AppComponent } from 'src/app/app.component';
 import { FirestoreConverter } from './firestore.converter';
@@ -12,6 +12,8 @@ import { UserFirestoreService } from './user.firestore.service';
 export class ItemFirestoreService {
     //#region Constants
     readonly TRIVIA_COLLECTION = "trivia"
+    readonly METADATA_COLLECTION = "metadata"
+    readonly CATEGORY_DOCUMENT = "categories"
     readonly BATCH_SIZE = 60;
     readonly firestoreConverterTriviaItem = new FirestoreConverter<TriviaItemDTO>(TriviaItemDTO)
     //#endregion
@@ -22,6 +24,7 @@ export class ItemFirestoreService {
     }
 
 
+    //#region Items
     async uploadItem(dto: TriviaItemDTO): Promise<void> {
         try {
             const userId = this.userFirestoreService.getUserData()?.id;
@@ -77,8 +80,31 @@ export class ItemFirestoreService {
         }
     }
 
+    async GetAllOwnedItems(): Promise<TriviaItemDTO[]> {
+        const userId = this.userFirestoreService.getUserData()?.id;
+
+        const items: TriviaItemDTO[] = [];
+        const itemRef = collection(this.db, this.TRIVIA_COLLECTION).withConverter(this.firestoreConverterTriviaItem);
+
+        const q = query(
+            itemRef,
+            where('owner', '==', userId),
+            orderBy(documentId())
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        querySnapshot.forEach((doc) => {
+            items.push(doc.data());
+        });
+
+        return items;
+    }
+
 
     async GetAllItems(lastitemId: string | null): Promise<TriviaItemDTO[]> {
+        const userId = this.userFirestoreService.getUserData()?.id;
+
         const items: TriviaItemDTO[] = [];
         const itemRef = collection(this.db, this.TRIVIA_COLLECTION).withConverter(this.firestoreConverterTriviaItem);;
 
@@ -87,6 +113,7 @@ export class ItemFirestoreService {
         if (lastitemId) {
             q = query(
                 itemRef,
+                where('owner', '!=', userId),
                 orderBy(documentId()),
                 startAfter(lastitemId),
                 limit(this.BATCH_SIZE)
@@ -112,6 +139,7 @@ export class ItemFirestoreService {
     }
 
     async GetAllItemsWithSearch(lastitemId: string | null, searchTerm: string): Promise<TriviaItemDTO[]> {
+        const userId = this.userFirestoreService.getUserData()?.id;
         const items: TriviaItemDTO[] = [];
         const itemRef = collection(this.db, this.TRIVIA_COLLECTION).withConverter(this.firestoreConverterTriviaItem);
 
@@ -119,6 +147,7 @@ export class ItemFirestoreService {
         if (lastitemId) {
             q = query(
                 itemRef,
+                where('owner', '!=', userId),
                 where('title', ">=", searchTerm),
                 where('title', "<", searchTerm + "z"),
                 orderBy(documentId()),
@@ -160,5 +189,80 @@ export class ItemFirestoreService {
         }
     }
 
+    //#endregion
+
+    //#region Category
+
+    async getCategories(): Promise<string[]> {
+        const ref = doc(this.db, 'metadata', 'categories');
+        const snap = await getDoc(ref);
+        return Object.keys(snap.data()?.['categories'] ?? {});
+    }
+    async getSubcategories(category: string): Promise<string[]> {
+        const ref = doc(this.db, 'metadata', 'categories');
+        const snap = await getDoc(ref);
+        return snap.data()?.['categories']?.[category] ?? [];
+    }
+
+    async addCategory(category: string): Promise<void> {
+        const ref = doc(this.db, this.METADATA_COLLECTION, this.CATEGORY_DOCUMENT);
+        await setDoc(ref, {
+            categories: { [category]: [] }
+        }, { merge: true });
+    }
+    async addSubcategory(category: string, subcategory: string): Promise<void> {
+        const ref = doc(this.db, this.METADATA_COLLECTION, this.CATEGORY_DOCUMENT);
+        const snap = await getDoc(ref);
+        const data = snap.data();
+        const current = data?.['categories']?.[category] ?? [];
+
+        if (!current.includes(subcategory)) {
+            const updated = [...current, subcategory];
+            await updateDoc(ref, {
+                [`categories.${category}`]: updated
+            });
+        }
+    }
+    async removeCategory(category: string): Promise<void> {
+        const triviaSnap = await getDocs(collection(this.db, 'trivia'));
+        const stillUsed = triviaSnap.docs.some(doc => {
+            const data = doc.data();
+            return data['category'] === category;
+        });
+
+        if (stillUsed) {
+            console.log(`La catégorie "${category}" est encore utilisée.`);
+            return;
+        }
+
+        const ref = doc(this.db, 'metadata', 'categories');
+        await updateDoc(ref, {
+            [`categories.${category}`]: deleteField()
+        });
+    }
+    async removeSubcategory(category: string, subcategory: string): Promise<void> {
+        const triviaSnap = await getDocs(collection(this.db, 'trivia'));
+        const stillUsed = triviaSnap.docs.some(doc => {
+            const data = doc.data();
+            return data['category'] === category && data['subcategory'] === subcategory;
+        });
+
+        if (stillUsed) {
+            console.log(`La sous-catégorie "${subcategory}" de "${category}" est encore utilisée.`);
+            return;
+        }
+
+        const ref = doc(this.db, 'metadata', 'categories');
+        const snap = await getDoc(ref);
+        const data = snap.data();
+        const current = data?.['categories']?.[category] ?? [];
+
+        const updated = current.filter((item: string) => item !== subcategory);
+        await updateDoc(ref, {
+            [`categories.${category}`]: updated
+        });
+    }
+
+    //#endregion
 }
 

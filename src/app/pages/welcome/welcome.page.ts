@@ -5,6 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
+import { LobbyService } from 'src/app/services/lobby.service';
 import { LoginComponent } from "../../shared/user/login/login.component";
 import { UserConfigService } from 'src/app/services/userconfig.service';
 import { UserDto } from '../user-profile/user.dto';
@@ -29,15 +30,31 @@ export class WelcomePage implements OnInit {
   }
 
 
+  async createGame() {
+    this.gameCode = this.gameCode.trim()
+    if (!this.gameCode)
+      this.gameCode = WelcomePage.generateCode(20)
+    if (this.gameCode.length < 4)
+      this.gameCode += "-" + WelcomePage.generateCode(12)
 
-  isUserLoggedIn() {
-    return this.userData !== null
+    this.router.navigate(['/lobby', this.gameCode], { state: { isCreate: true } });
   }
 
-  joinGame() {
-    if (this.gameCode.trim()) {
-      this.router.navigate(['/lobby', this.gameCode]);
+  async joinGame() {
+    this.router.navigate(['/lobby', this.gameCode]);
+  }
+
+
+
+  public static generateCode(length: number): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+
+    for (let i = 0; i < length; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
+
+    return code;
   }
 
 }

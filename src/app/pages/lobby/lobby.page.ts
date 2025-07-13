@@ -7,77 +7,103 @@ import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from 'src/app/shared/component/header/header.component';
 import { IonicModule } from '@ionic/angular';
 import { ItemFirestoreService } from 'src/app/services/firestore/item.firestore.service';
+import { Lobby } from '../game/lobby';
 import { LobbyService } from 'src/app/services/lobby.service';
+import { Player } from '../game/player';
+import { PlayersCardComponent } from 'src/app/shared/component/players-card/players-card.component';
 import { UserConfigService } from 'src/app/services/userconfig.service';
+import { addIcons } from 'ionicons';
+import { clipboard } from 'ionicons/icons';
 
 @Component({
   selector: 'app-lobby',
   templateUrl: './lobby.page.html',
   styleUrls: ['./lobby.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, HeaderComponent],
+  imports: [IonicModule, CommonModule, FormsModule, HeaderComponent, PlayersCardComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class LobbyPage implements OnInit {
+  lobby: Lobby | null = null
+  players: Player[] = []
+
   lobbyCode: string = "";
-  username: string = "";
+  playerName: string = "";
   selectedSize = 8
 
   categoryList: string[] = []
   subcategoryList: string[] = []
 
-  static categoryPicked: string | null = null;
-  get categoryPicked() { return LobbyPage.categoryPicked }
-  set categoryPicked(value) { LobbyPage.categoryPicked = value }
+  categoryPicked: string | null = null;
+  subcategoryPicked: string | null = null;
 
-  static subcategoryPicked: string | null = null;
-  get subcategoryPicked() { return LobbyPage.subcategoryPicked }
-  set subcategoryPicked(value) { LobbyPage.subcategoryPicked = value }
+  isOwner: boolean = false
 
-  static isMaster: boolean = false
-  get isMaster() { return LobbyPage.isMaster }
 
-  constructor(private route: ActivatedRoute, private router: Router, private userConfigService: UserConfigService, private itemService: ItemFirestoreService) {
-    this.username = this.userConfigService.getConfig()['gameName'];
-    const lobbyId = this.route.snapshot.paramMap.get('id');
-    if (lobbyId) {
-      LobbyPage.isMaster = false
-    } else {
-      this.lobbyCode = "NewLobbyID"
-      LobbyPage.isMaster = true
+  unsubscribeLobby: any;
+  unsubscribePlayers: any;
+
+  constructor(private route: ActivatedRoute, private router: Router, private userConfigService: UserConfigService, private itemService: ItemFirestoreService, private lobbyService: LobbyService) {
+    addIcons({ clipboard })
+    lobbyService.cleanLobbyDB()
+
+    this.playerName = this.userConfigService.getConfig()['gameName'];
+    this.lobbyCode = this.route.snapshot.paramMap.get('code') ?? ""
+    if (!this.lobbyCode) {
+      this.router.navigateByUrl('home')
+      return
     }
+  }
+
+  async ngOnInit() {
+    const isCreate = this.router.getCurrentNavigation()?.extras.state?.['isCreate'];
+    console.log(this.lobbyCode)
+    if (isCreate) {
+      if (await this.lobbyService.lobbyAlreadyExist(this.lobbyCode)) {
+        this.router.navigateByUrl('home')
+        return
+      }
+      this.lobbyService.createLobby(this.lobbyCode)
+
+    } else {
+      if (await this.lobbyService.lobbyDoesNotExist(this.lobbyCode)) {
+        this.router.navigateByUrl('home')
+        return
+      }
+
+      this.lobbyService.joinLobby(this.lobbyCode)
+    }
+
+
+    this.unsubscribeLobby = this.lobbyService.listenLobby(this.lobbyCode, (lobby) => {
+      this.lobby = lobby;
+    });
+
+    this.unsubscribePlayers = this.lobbyService.listenPlayers(this.lobbyCode, (list) => {
+      console.log(list)
+      this.players = list;
+    });
 
   }
 
   ionViewWillLeave() {
-    if (this.router.url.startsWith('/game'))
-      return
+    this.lobbyService.leaveLobby(this.lobbyCode)
 
   }
-
-  ngOnInit() {
-
+  ngOnDestroy() {
+    this.unsubscribeLobby?.();
+    this.unsubscribePlayers?.();
   }
-
-  onLobbyDontExist() {
-    AppComponent.presentWarningToast("Lobby does not exists")
-    this.router.navigateByUrl('home')
-  }
-
-
-
-
-  copyToClipboard() {
-    navigator.clipboard.writeText("https://" + window.location.hostname + this.router.url + "/" + this.lobbyCode);
-    AppComponent.presentOkToast("Code Copied")
-  }
-
 
 
   updateName<T>(): void {
-    this.userConfigService.updateConfig('gameName', this.username);
+    this.userConfigService.updateConfig('gameName', this.playerName);
+    this.lobbyService.changePlayerName(this.lobbyCode, this.playerName)
   }
 
 
-
+  copyToClipboard() {
+    navigator.clipboard.writeText("https://" + window.location.hostname + this.router.url);
+    AppComponent.presentOkToast("Code Copied")
+  }
 }

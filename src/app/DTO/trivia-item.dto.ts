@@ -1,13 +1,12 @@
 export class TriviaItemDTO {
-    get id(): string { return `${this.name}` }
-    name: string;
+    get id(): string { return `${this.answer}` }
     category: string | undefined;
     subcategory: string | undefined;
     question: string;
     answer: string;
+    owner: string | undefined;
 
-    constructor(name?: string, question?: string, answer?: string) {
-        this.name = name ?? ""
+    constructor(question?: string, answer?: string) {
         this.question = question ?? ""
         this.answer = answer ?? ""
     }

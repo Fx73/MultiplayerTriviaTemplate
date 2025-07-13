@@ -12,15 +12,19 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/welcome/welcome.page').then(m => m.WelcomePage)
   },
   {
+    path: 'lobby/:code',
+    loadComponent: () => import('./pages/lobby/lobby.page').then(m => m.LobbyPage)
+  },
+  {
     path: 'game',
-    loadComponent: () => import('./game/game.page').then(m => m.GamePage)
+    loadComponent: () => import('./pages/game/game.page').then(m => m.GamePage)
   },
   {
     path: 'options',
     loadComponent: () => import('./pages/options/options.page').then(m => m.OptionsPage)
   },
   {
-    path: 'play/browse',
+    path: 'browse',
     loadComponent: () => import('./pages/browse/browse.page').then(m => m.BrowsePage),
   },
   {

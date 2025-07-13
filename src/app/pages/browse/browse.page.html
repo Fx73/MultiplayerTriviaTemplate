@@ -2,25 +2,63 @@
 <ion-content fullscreen="false">
   <ion-split-pane when="xs" contentId="item-list">
     <ion-menu contentId="item-list">
+      <ion-button expand="block" color="secondary" (click)="onAddNewItem()">
+        Add new item
+      </ion-button>
       <ion-card *ngIf="selectedItem" class="levelCard">
         <ion-card-header>
-          <ion-card-title> {{ selectedItem.name }} </ion-card-title>
-          <ion-card-subtitle> </ion-card-subtitle>
+          <ion-card-title>{{ selectedItem.id || 'New Trivia Item' }}</ion-card-title>
+          <ion-card-subtitle *ngIf="selectedItem.owner">{{ selectedItem.owner }}</ion-card-subtitle>
         </ion-card-header>
+
         <ion-card-content>
+          <ion-item [disabled]="selectedItem.owner !== undefined && selectedItem.owner !== userId">
+            <ion-label position="stacked">Category</ion-label>
+            <ion-input [(ngModel)]="selectedItem.category"></ion-input>
+          </ion-item>
+
+          <ion-item [disabled]="selectedItem.owner !== undefined && selectedItem.owner !== userId">
+            <ion-label position="stacked">Subcategory</ion-label>
+            <ion-input [(ngModel)]="selectedItem.subcategory"></ion-input>
+          </ion-item>
+
+          <ion-item [disabled]="selectedItem.owner !== undefined && selectedItem.owner !== userId">
+            <ion-label position="stacked">Question</ion-label>
+            <ion-textarea [(ngModel)]="selectedItem.question" autoGrow="true"></ion-textarea>
+          </ion-item>
+
+          <ion-item [disabled]="selectedItem.owner !== undefined && selectedItem.owner !== userId">
+            <ion-label position="stacked">Answer</ion-label>
+            <ion-textarea [(ngModel)]="selectedItem.answer" autoGrow="true"></ion-textarea>
+          </ion-item>
+
+
+          <ion-button *ngIf="!selectedItem.owner" expand="block" color="primary" (click)="onUploadItem()">
+            Upload
+          </ion-button>
+          <ion-button *ngIf="selectedItem.owner" expand="block" color="primary" (click)="onSaveItem()">
+            Save Changes
+          </ion-button>
+          <ion-button *ngIf="selectedItem.owner" expand="block" color="danger" (click)="onRemoveItem()">
+            Remove
+          </ion-button>
         </ion-card-content>
+      </ion-card>
+
+      <ion-card *ngIf="!selectedItem" class="levelCard">
+        No item selected
       </ion-card>
     </ion-menu>
     <div id="item-list">
       <ion-searchbar [debounce]="1000" (ionInput)="onSearch($event)" show-clear-button="focus"
         style="background-color:white"></ion-searchbar>
       <div class="cardList">
-        <!-- Music cards -->
+        <!-- Item cards -->
         <ion-card *ngFor="let item of items" (click)="select(item)" class="basicCard"
           [ngClass]="item?.id === item.id ? 'selectedCard' : ''">
           <ion-card-header>
-            <ion-card-title>{{ item.name }}</ion-card-title>
-            <ion-card-subtitle></ion-card-subtitle>
+            <ion-card-title>{{ item.answer }}</ion-card-title>
+            <ion-card-subtitle>{{ item.owner }}</ion-card-subtitle>
           </ion-card-header>
           <ion-card-content class="basicCardContent">
           </ion-card-content>

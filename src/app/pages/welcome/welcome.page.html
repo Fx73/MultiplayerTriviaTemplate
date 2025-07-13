@@ -10,23 +10,25 @@
 						</ion-card-title>
 					</ion-card-header>
 					<ion-card-content>
+						<ion-card style="border:solid;margin-left:5%;margin-right:5%">
+							<ion-card-header>
+								<ion-card-title> Lobby Code </ion-card-title>
+							</ion-card-header>
+							<ion-card-content [style.background]="'white'">
+								<ion-input #gameCodeInput="ngModel" [(ngModel)]="gameCode" minlength="4"
+									placeholder="Type your lobby code here" maxlength="20" required></ion-input>
+							</ion-card-content>
+						</ion-card>
 						<ion-card-header>
-							<ion-card class="base-card start-card welcome-start-card"
-								[routerLink]="['/play/player-selection']">
-								Start Game
+							<ion-card class="base-card start-card welcome-start-card" (click)="createGame()">
+								Create Game
 							</ion-card>
 						</ion-card-header>
 						<ion-card-content>
-							<ion-card class="base-card start-card welcome-start-card2"
-								[routerLink]="['/lobby',gameCode]" [disabled]="gameCodeInput.invalid">
+							<ion-card class="base-card start-card welcome-start-card2" (click)="joinGame()"
+								[disabled]="gameCodeInput.invalid">
 								Join Game
 							</ion-card>
-							<ion-card>
-								<ion-card-header><ion-card-title>Enter Code to join :</ion-card-title></ion-card-header>
-								<ion-card-content [style.background]="'white'">
-									<ion-input #gameCodeInput="ngModel" [(ngModel)]="gameCode" minlength="6"
-										placeholder="Code Here" maxlength="6"
-										required></ion-input></ion-card-content></ion-card>
 						</ion-card-content>
 					</ion-card-content>
 				</ion-card>
@@ -38,13 +40,13 @@
 						<ion-card-subtitle *ngIf="!userData"> Log in to upload your questions</ion-card-subtitle>
 					</ion-card-header>
 					<ion-card-content>
-						<ion-button *ngIf="userData" [routerLink]="['/user-profile']" [disabled]="!isUserLoggedIn()"
-							expand="block" size="small" class="home-content">
-							My Profile
-						</ion-button>
-						<ion-button [routerLink]="['/browse-upload']" [disabled]="!isUserLoggedIn()" expand="block"
+						<ion-button [routerLink]="['/browse']" [disabled]="!userData" expand="block"
 							class="home-content">
 							Content browser
+						</ion-button>
+						<ion-button *ngIf="userData" [routerLink]="['/user-profile']" expand="block" size="small"
+							class="home-content">
+							My Profile
 						</ion-button>
 						<ion-button [routerLink]="['/options']" expand="block" size="small" class="home-content"
 							color="dark">

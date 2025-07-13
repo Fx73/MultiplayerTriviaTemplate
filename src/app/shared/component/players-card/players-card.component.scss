@@ -1,0 +1,16 @@
+.playerItem{
+  --padding-start: 1px;
+  ion-icon{
+    margin-right: 8px ;
+  }
+}
+
+
+.cardPlayers{
+  text-align: center;
+}
+
+
+.playerItem.voted {
+  color: green;
+}
