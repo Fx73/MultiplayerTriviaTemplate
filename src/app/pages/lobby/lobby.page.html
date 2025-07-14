@@ -20,8 +20,8 @@
 				</ion-card>
 			</ion-col>
 			<ion-col>
-				<app-players-card [players]="players" [ownerName]="lobby.host"
-					[isCurrentlyOwner]="isOwner"></app-players-card>
+				<app-players-card [players]="players" [ownerId]="lobby.host" [isCurrentlyOwner]="isOwner"
+					(eventKickPlayer)="onKickPlayerFromLobby($event)"></app-players-card>
 			</ion-col>
 			<ion-col>
 				<ion-card class="cardContainer">
@@ -30,27 +30,27 @@
 					</ion-card-header>
 					<ion-card-content class="cardListCentered">
 						<ion-item>
-							<ion-label position="stacked">Question number</ion-label>
-							<ion-input type="number" [(ngModel)]="questionCount" (ionBlur)="onQuestionCountChange()"
-								placeholder="ex: 10" min="1" max="50" inputmode="numeric">
+							<ion-input label="Question count" type="number" [(ngModel)]="questionCount"
+								(ionBlur)="onQuestionCountChange()" placeholder="ex: 10" min="1" max="50"
+								inputmode="numeric">
 							</ion-input>
 						</ion-item>
 
 						<ion-item>
 							<ion-label>Catégorie</ion-label>
-							<ion-select [(ngModel)]="categoryPicked" (ionChange)="onCategorySelect()"
+							<ion-select [(ngModel)]="lobby.category" (ionChange)="onCategorySelect()"
 								interface="popover">
-								<ion-select-option [value]="null">Aucune</ion-select-option>
-								<ion-select-option *ngFor="let cat of categoryList" [value]="cat">
-									{{ cat }}
+								<ion-select-option [value]="null">No category</ion-select-option>
+								<ion-select-option *ngFor="let category of categoryList" [value]="category">
+									{{ category }}
 								</ion-select-option>
 							</ion-select>
 						</ion-item>
-						<ion-item *ngIf="categoryPicked">
+						<ion-item *ngIf="lobby.category">
 							<ion-label>Sous-catégorie</ion-label>
-							<ion-select [(ngModel)]="subcategoryPicked" interface="popover"
+							<ion-select [(ngModel)]="lobby.subcategory" interface="popover"
 								(ionChange)="onSubcategorySelect()">
-								<ion-select-option [value]="null">Aucune</ion-select-option>
+								<ion-select-option [value]="null">No category</ion-select-option>
 								<ion-select-option *ngFor="let sub of subcategoryList" [value]="sub">
 									{{ sub }}
 								</ion-select-option>

@@ -10,6 +10,7 @@ import { LoginComponent } from "../../shared/user/login/login.component";
 import { UserConfigService } from 'src/app/services/userconfig.service';
 import { UserDto } from '../user-profile/user.dto';
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
+import { generateAlphaNumCode } from 'src/app/shared/util';
 
 @Component({
   selector: 'app-welcome',
@@ -33,9 +34,9 @@ export class WelcomePage implements OnInit {
   async createGame() {
     this.gameCode = this.gameCode.trim()
     if (!this.gameCode)
-      this.gameCode = WelcomePage.generateCode(20)
+      this.gameCode = generateAlphaNumCode(20)
     if (this.gameCode.length < 4)
-      this.gameCode += "-" + WelcomePage.generateCode(12)
+      this.gameCode += "-" + generateAlphaNumCode(12)
 
     this.router.navigate(['/lobby', this.gameCode], { state: { isCreate: true } });
   }
@@ -44,17 +45,5 @@ export class WelcomePage implements OnInit {
     this.router.navigate(['/lobby', this.gameCode]);
   }
 
-
-
-  public static generateCode(length: number): string {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let code = '';
-
-    for (let i = 0; i < length; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-
-    return code;
-  }
 
 }

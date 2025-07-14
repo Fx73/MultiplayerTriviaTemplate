@@ -1,6 +1,5 @@
-import { Component, Input, OnInit, input } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
-import { removeOutline, star } from 'ionicons/icons';
+import { Component, EventEmitter, Input, OnInit, Output, input } from '@angular/core';
+import { closeCircle, removeOutline, star } from 'ionicons/icons';
 
 import { IonicModule } from '@ionic/angular';
 import { Player } from 'src/app/shared/DTO/player';
@@ -11,26 +10,32 @@ import { addIcons } from 'ionicons';
   templateUrl: './players-card.component.html',
   styleUrls: ['./players-card.component.scss'],
   standalone: true,
-  imports: [IonicModule, NgIf, NgFor],
+  imports: [IonicModule],
 })
 
-export class PlayersCardComponent implements OnInit {
+export class PlayersCardComponent {
   @Input()
-  ownerName: string = ""
+  ownerId!: string
 
   @Input()
-  players: Player[] = []
+  players!: Player[]
 
   @Input()
   isCurrentlyOwner = false
 
+  @Output() eventKickPlayer = new EventEmitter<string>();
+
+
+
   constructor() {
-    addIcons({ star, removeOutline });
+    addIcons({ star, removeOutline, closeCircle });
 
   }
 
-  ngOnInit(): void {
-
+  kickPlayer(playerId: string) {
+    console.log("trying to kick : ", playerId)
+    this.eventKickPlayer.emit(playerId);
   }
+
 
 }

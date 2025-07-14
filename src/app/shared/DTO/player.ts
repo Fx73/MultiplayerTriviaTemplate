@@ -1,8 +1,12 @@
+import { Timestamp } from '@firebase/firestore';
+
 export class Player {
     id: string = ""
     name: string = "MisterDefault"
     score = 0
     isReady = false
+    lastTimeSeen: Timestamp = Timestamp.now();
+
 
     constructor(id: string, name: string) {
         this.id = id

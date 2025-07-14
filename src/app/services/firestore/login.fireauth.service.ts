@@ -24,7 +24,6 @@ export class LoginFireauthService {
   register(email: string, password: string): void {
     createUserWithEmailAndPassword(this.auth, email, password)
       .catch((error) => {
-        console.log(email)
         const errorCode = error.code;
         const errorMessage = error.message;
         AppComponent.presentWarningToast(errorMessage)

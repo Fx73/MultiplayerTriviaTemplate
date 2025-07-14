@@ -27,18 +27,17 @@ export class LobbyPage implements OnInit {
   lobby: Lobby | null = null
   players: Player[] = []
 
-  lobbyCode: string = "";
-  playerName: string = "";
+  lobbyCode: string;
+  playerName: string;
+  playerId: string
   selectedSize = 8
 
   categoryList: string[] = []
   subcategoryList: string[] = []
 
-  categoryPicked: string | null = null;
-  subcategoryPicked: string | null = null;
   questionCount: number = 10;
 
-  isOwner: boolean = false
+  get isOwner(): boolean { return this.lobby?.host === this.playerId }
 
 
   unsubscribeLobby: any;
@@ -49,6 +48,8 @@ export class LobbyPage implements OnInit {
     lobbyService.cleanLobbyDB()
 
     this.playerName = this.userConfigService.getConfig()['gameName'];
+    this.playerId = this.userConfigService.getConfig()['playerId'];
+
     this.lobbyCode = this.route.snapshot.paramMap.get('code') ?? ""
     if (!this.lobbyCode) {
       this.router.navigateByUrl('home')
@@ -58,9 +59,9 @@ export class LobbyPage implements OnInit {
 
   async ngOnInit() {
     const isCreate = this.router.getCurrentNavigation()?.extras.state?.['isCreate'];
-    console.log(this.lobbyCode)
     if (isCreate) {
       if (await this.lobbyService.lobbyAlreadyExist(this.lobbyCode)) {
+        AppComponent.presentWarningToast("This lobby already exist")
         this.router.navigateByUrl('home')
         return
       }
@@ -68,6 +69,7 @@ export class LobbyPage implements OnInit {
 
     } else {
       if (await this.lobbyService.lobbyDoesNotExist(this.lobbyCode)) {
+        AppComponent.presentWarningToast("This lobby does not exist")
         this.router.navigateByUrl('home')
         return
       }
@@ -77,11 +79,12 @@ export class LobbyPage implements OnInit {
 
 
     this.unsubscribeLobby = this.lobbyService.listenLobby(this.lobbyCode, (lobby) => {
+      console.log('Lobby received :', lobby)
       this.lobby = lobby;
     });
 
     this.unsubscribePlayers = this.lobbyService.listenPlayers(this.lobbyCode, (list) => {
-      console.log(list)
+      console.log('PlayerList received :', list)
       this.players = list;
     });
 
@@ -105,16 +108,23 @@ export class LobbyPage implements OnInit {
 
 
   async onCategorySelect() {
-    await this.lobbyService.updateLobby(this.lobbyCode, 'category', this.categoryPicked)
-    if (this.categoryPicked)
-      this.subcategoryList = await this.itemService.getSubcategories(this.categoryPicked)
+    if (!this.lobby) return
+    await this.lobbyService.updateLobby(this.lobbyCode, 'category', this.lobby.category)
+    if (this.lobby.category)
+      this.subcategoryList = await this.itemService.getSubcategories(this.lobby.category)
   }
   async onSubcategorySelect() {
-    await this.lobbyService.updateLobby(this.lobbyCode, 'subcategory', this.subcategoryPicked)
+    if (!this.lobby) return
+    await this.lobbyService.updateLobby(this.lobbyCode, 'subcategory', this.lobby.subcategory)
   }
   async onQuestionCountChange() {
     await this.lobbyService.updateLobby(this.lobbyCode, 'questionCount', this.questionCount)
   }
+
+  onKickPlayerFromLobby(playerId: string): void {
+    this.lobbyService.kickPlayer(this.lobbyCode, playerId);
+  }
+
 
   copyToClipboard() {
     navigator.clipboard.writeText("https://" + window.location.hostname + this.router.url);

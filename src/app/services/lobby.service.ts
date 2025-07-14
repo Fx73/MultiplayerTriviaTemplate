@@ -1,6 +1,7 @@
 import { DocumentReference, Firestore, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, onSnapshot, serverTimestamp, setDoc, updateDoc } from '@firebase/firestore';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 
+import { AppComponent } from '../app.component';
 import { Injectable } from '@angular/core';
 import { Lobby } from '../shared/DTO/lobby';
 import { Player } from '../shared/DTO/player';
@@ -21,7 +22,7 @@ export class LobbyService {
 
   constructor(private userConfigService: UserConfigService) {
     this.db = getFirestore()
-    this.playerId = "player-" + WelcomePage.generateCode(22)
+    this.playerId = this.userConfigService.getConfig()["playerId"]
 
   }
 
@@ -75,6 +76,8 @@ export class LobbyService {
       throw new Error('Player already in lobby');
     }
     await setDoc(playerRef, { ...player });
+
+    this.startHeartbeat(lobbyCode)
   }
 
   async changePlayerName(lobbyCode: string, newName: string): Promise<void> {
@@ -89,6 +92,7 @@ export class LobbyService {
   }
 
   async kickPlayer(lobbyCode: string, targetPlayerId: string): Promise<void> {
+    console.log("Kicking Player : ", targetPlayerId)
     const lobbyRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode);
     const lobbySnap = await getDoc(lobbyRef);
 
@@ -113,6 +117,7 @@ export class LobbyService {
 
 
   async updateLobby(lobbyCode: string, key: string, value: any): Promise<void> {
+    console.log("Updating Lobby ", lobbyCode, key, value)
     const lobbyRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode);
     const snap = await getDoc(lobbyRef);
 
@@ -126,13 +131,15 @@ export class LobbyService {
 
 
   async leaveLobby(lobbyCode: string): Promise<void> {
+    console.log("Leaving Lobby ", lobbyCode)
+    this.stopHeartbeat()
+
     const playerRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode, this.PLAYERS_COLLECTION, this.playerId);
 
     const snap = await getDoc(playerRef);
     if (!snap.exists()) {
       throw new Error('Player not present in lobby');
     }
-    this.stopHeartbeat()
     await deleteDoc(playerRef);
 
     const lobbyRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode);
@@ -141,9 +148,7 @@ export class LobbyService {
 
     if (lobbySnap.data()['host'] === this.playerId) {
       const playersSnap = await getDocs(collection(this.db, this.LOBBY_COLLECTION, lobbyCode, this.PLAYERS_COLLECTION));
-      if (playersSnap.empty) {
-        await deleteDoc(lobbyRef);
-      } else {
+      if (!playersSnap.empty) {
         const newHostId = playersSnap.docs[0].id;
         await updateDoc(lobbyRef, { host: newHostId });
       }
@@ -200,6 +205,7 @@ export class LobbyService {
 
   private async heartbeat(lobbyRef: DocumentReference, playerRef: DocumentReference, lobbyCode: string): Promise<void> {
     try {
+      console.log("🫀 HEARTBEAT")
       // 🫀 Player Heart beat
       await updateDoc(playerRef, { lastTimeSeen: serverTimestamp() });
 
@@ -215,21 +221,28 @@ export class LobbyService {
 
       for (const docSnap of playersSnap.docs) {
         const data = docSnap.data();
+
         const lastSeen = data['lastTimeSeen']?.toDate?.();
         const targetId = docSnap.id;
 
         // ⏰ Kick if one minute inactive
-        if (!lastSeen || now - lastSeen.getTime() > 60000) {
+        if (targetId != this.playerId && (now - lastSeen.getTime() > 60000)) {
+          console.log("Inactive player found. Kicking ...", docSnap)
+
           await deleteDoc(docSnap.ref);
 
           // 👑 If host kick, I take ownership
           if (targetId === lobbyData['host']) {
+            console.log("Kicked player was owner. Trying to steal ownership !")
             await updateDoc(lobbyRef, { host: this.playerId });
           }
         }
       }
-    } catch (err) {
-      console.error('Erreur heartbeat step :', err);
+    } catch (err: any) {
+      if (err.code === 'not-found')
+        AppComponent.presentErrorToast("YOU HAVE BEEN KICKED FROM LOBBY")
+      else
+        console.error('Erreur heartbeat step :', err);
     }
   }
 

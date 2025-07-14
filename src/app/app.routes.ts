@@ -26,6 +26,7 @@ export const routes: Routes = [
   {
     path: 'browse',
     loadComponent: () => import('./pages/browse/browse.page').then(m => m.BrowsePage),
+    canActivate: [UserGuard]
   },
   {
     path: 'user-profile',

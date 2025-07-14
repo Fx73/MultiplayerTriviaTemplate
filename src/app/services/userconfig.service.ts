@@ -1,6 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { UserFirestoreService } from './firestore/user.firestore.service';
+import { generateAlphaNumCode } from '../shared/util';
 
 @Injectable({
     providedIn: 'root',
@@ -15,12 +16,16 @@ export class UserConfigService {
 
 
     constructor(private userFirestoreService: UserFirestoreService) {
-        const storedConfig: UserConfig = JSON.parse(localStorage.getItem(this.CONFIG_STORAGE_KEY) || '{}');
-        const defaultConfig = new UserConfig();
+        const storedConfig: UserConfig = JSON.parse(localStorage.getItem(this.CONFIG_STORAGE_KEY)!);
+        const defaultConfig: UserConfig = new UserConfig();
+        const finalConfig: UserConfig = { ...defaultConfig, ...storedConfig };
 
-        this.configSubject = new BehaviorSubject<UserConfig>({ ...defaultConfig, ...storedConfig });
+        if (JSON.stringify(storedConfig) !== JSON.stringify(finalConfig)) {
+            localStorage.setItem(this.CONFIG_STORAGE_KEY, JSON.stringify(finalConfig));
+        }
 
-
+        this.configSubject = new BehaviorSubject<UserConfig>(finalConfig);
+        console.log({ ...defaultConfig, ...storedConfig }.playerId)
     }
 
 
@@ -53,6 +58,6 @@ export class UserConfigService {
 
 class UserConfig {
     gameName = "MisterDefault"
-
+    playerId = "player-" + generateAlphaNumCode(22)
 
 }
