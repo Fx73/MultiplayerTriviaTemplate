@@ -29,6 +29,7 @@ export class ItemFirestoreService {
         try {
             const userId = this.userFirestoreService.getUserData()?.id;
             if (!userId) throw new Error("User not authenticated");
+            dto.owner = userId
 
             const itemRef = doc(this.db, this.TRIVIA_COLLECTION, dto.id).withConverter(this.firestoreConverterTriviaItem);
             await setDoc(itemRef, dto);
@@ -142,7 +143,6 @@ export class ItemFirestoreService {
         if (lastitemId) {
             q = query(
                 itemRef,
-                where('owner', '!=', userId),
                 orderBy(documentId()),
                 startAfter(lastitemId),
                 limit(this.BATCH_SIZE)
@@ -176,7 +176,6 @@ export class ItemFirestoreService {
         if (lastitemId) {
             q = query(
                 itemRef,
-                where('owner', '!=', userId),
                 where('title', ">=", searchTerm),
                 where('title', "<", searchTerm + "z"),
                 orderBy(documentId()),
@@ -240,32 +239,32 @@ export class ItemFirestoreService {
     //#region Category
 
     async getCategories(): Promise<string[]> {
-        const ref = doc(this.db, 'metadata', 'categories');
+        const ref = doc(this.db, this.METADATA_COLLECTION, this.CATEGORY_DOCUMENT);
         const snap = await getDoc(ref);
-        return Object.keys(snap.data()?.['categories'] ?? {});
+        return Object.keys(snap.data()?.['category'] ?? {});
     }
     async getSubcategories(category: string): Promise<string[]> {
-        const ref = doc(this.db, 'metadata', 'categories');
+        const ref = doc(this.db, this.METADATA_COLLECTION, this.CATEGORY_DOCUMENT);
         const snap = await getDoc(ref);
-        return snap.data()?.['categories']?.[category] ?? [];
+        return snap.data()?.['category']?.[category] ?? [];
     }
 
     async addCategory(category: string): Promise<void> {
         const ref = doc(this.db, this.METADATA_COLLECTION, this.CATEGORY_DOCUMENT);
         await setDoc(ref, {
-            categories: { [category]: [] }
+            category: { [category]: [] }
         }, { merge: true });
     }
     async addSubcategory(category: string, subcategory: string): Promise<void> {
         const ref = doc(this.db, this.METADATA_COLLECTION, this.CATEGORY_DOCUMENT);
         const snap = await getDoc(ref);
         const data = snap.data();
-        const current = data?.['categories']?.[category] ?? [];
+        const current = data?.['category']?.[category] ?? [];
 
         if (!current.includes(subcategory)) {
             const updated = [...current, subcategory];
             await updateDoc(ref, {
-                [`categories.${category}`]: updated
+                [`category.${category}`]: updated
             });
         }
     }
@@ -277,13 +276,13 @@ export class ItemFirestoreService {
         });
 
         if (stillUsed) {
-            console.log(`La catégorie "${category}" est encore utilisée.`);
+            console.log(`Category "${category}" is still in use`);
             return;
         }
 
-        const ref = doc(this.db, 'metadata', 'categories');
+        const ref = doc(this.db, this.METADATA_COLLECTION, this.CATEGORY_DOCUMENT);
         await updateDoc(ref, {
-            [`categories.${category}`]: deleteField()
+            [`category.${category}`]: deleteField()
         });
     }
     async removeSubcategory(category: string, subcategory: string): Promise<void> {
@@ -294,18 +293,18 @@ export class ItemFirestoreService {
         });
 
         if (stillUsed) {
-            console.log(`La sous-catégorie "${subcategory}" de "${category}" est encore utilisée.`);
+            console.log(`Subcategory "${subcategory}" of "${category}" is still in use`);
             return;
         }
 
-        const ref = doc(this.db, 'metadata', 'categories');
+        const ref = doc(this.db, this.METADATA_COLLECTION, this.CATEGORY_DOCUMENT);
         const snap = await getDoc(ref);
         const data = snap.data();
-        const current = data?.['categories']?.[category] ?? [];
+        const current = data?.['category']?.[category] ?? [];
 
         const updated = current.filter((item: string) => item !== subcategory);
         await updateDoc(ref, {
-            [`categories.${category}`]: updated
+            [`category.${category}`]: updated
         });
     }
 

@@ -57,5 +57,21 @@ export class UserFirestoreService {
         }
     }
 
+    async getUserNameMap(userIds: string[]): Promise<Map<string, string>> {
+        if (userIds.length === 0) return new Map();
+
+        const userRefs = userIds.map(id => doc(this.db, this.USER_COLLECTION, id).withConverter(this.firestoreConverterUser));
+        const userSnaps = await Promise.all(userRefs.map(ref => getDoc(ref)));
+
+        const map = new Map<string, string>();
+        userSnaps.forEach((snap, index) => {
+            const id = userIds[index];
+            const data = snap.data();
+            map.set(id, data?.name ?? 'Unknown');
+        });
+
+        return map;
+    }
+
 
 }
