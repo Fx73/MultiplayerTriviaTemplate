@@ -5,6 +5,7 @@ export class Lobby {
     questionCount: number = 10
     isTimed: boolean = true
     timerDuration = 60
+    answerStrictness = 0
     createdAt: Date = new Date()
     state: GameState = GameState.InLobby;
     questionList: string[] = []

@@ -1,6 +1,7 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { CUSTOM_ELEMENTS_SCHEMA, Component, OnDestroy, OnInit } from '@angular/core';
 import { GameState, Lobby } from '../../shared/DTO/lobby';
+import { clipboard, helpCircleOutline } from 'ionicons/icons';
 
 import { AppComponent } from 'src/app/app.component';
 import { CommonModule } from '@angular/common';
@@ -15,7 +16,6 @@ import { Subscription } from 'rxjs';
 import { SystemMessageProvider } from 'src/app/shared/system-message-provider';
 import { UserConfigService } from 'src/app/services/userconfig.service';
 import { addIcons } from 'ionicons';
-import { clipboard } from 'ionicons/icons';
 
 @Component({
   selector: 'app-lobby',
@@ -41,7 +41,7 @@ export class LobbyPage implements OnInit, OnDestroy {
   private stateSub!: Subscription;
 
   constructor(private route: ActivatedRoute, private router: Router, private userConfigService: UserConfigService, private itemService: ItemFirestoreService, private lobbyService: LobbyService) {
-    addIcons({ clipboard })
+    addIcons({ clipboard, helpCircleOutline })
     lobbyService.cleanLobbyDB()
 
     this.lobbyCode = this.route.snapshot.paramMap.get('code') ?? ""
@@ -143,5 +143,9 @@ export class LobbyPage implements OnInit, OnDestroy {
   copyToClipboard() {
     navigator.clipboard.writeText("https://" + window.location.hostname + this.router.url);
     AppComponent.presentOkToast("Code Copied")
+  }
+
+  pinFormatter(value: number) {
+    return `${value}`;
   }
 }

@@ -304,7 +304,7 @@ export class LobbyService {
         const targetId = docSnap.id;
 
         // ⏰ Kick if one minute inactive
-        if (targetId != this.playerId && (now - lastSeen.getTime() > 60000)) {
+        if (targetId != this.playerId && lastSeen && (now - lastSeen.getTime() > 60000)) {
           console.log("Inactive player found. Kicking ...", docSnap)
 
           await updateDoc(docSnap.ref, {
@@ -332,7 +332,16 @@ export class LobbyService {
 
   //#region Game
   async playerFoundAnswer(lobbyCode: string): Promise<void> {
-    const playerRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode, this.PLAYERS_COLLECTION, this.playerId);
+    const playersCollectionRef = collection(this.db, this.LOBBY_COLLECTION, lobbyCode, this.PLAYERS_COLLECTION);
+    const querySnapshot = await getDocs(playersCollectionRef);
+
+    const readyCount = querySnapshot.docs.filter(doc => doc.data()['isReady']).length;
+
+    // Score calculation
+    const scoreMap = [10, 8, 6, 4, 2];
+    const score = scoreMap[readyCount] ?? 1;
+
+    const playerRef = doc(playersCollectionRef, this.playerId);
     const snap = await getDoc(playerRef);
 
     if (!snap.exists()) {
@@ -341,9 +350,11 @@ export class LobbyService {
 
     await updateDoc(playerRef, {
       isReady: true,
-      score: increment(1)
+      score: increment(score),
+      answerOrder: readyCount + 1
     });
   }
+
 
   async advanceToNextQuestion(lobbyCode: string): Promise<void> {
     const lobbyRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode);
@@ -359,7 +370,7 @@ export class LobbyService {
 
     const batch = writeBatch(this.db);
     playerSnaps.forEach(playerDoc => {
-      batch.update(playerDoc.ref, { isReady: false });
+      batch.update(playerDoc.ref, { isReady: false, answerOrder: 0 });
     });
     await batch.commit();
 

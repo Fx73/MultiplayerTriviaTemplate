@@ -5,6 +5,7 @@ export class Player {
     name: string = "MisterDefault"
     score = 0
     isReady = false
+    answerOrder = 0
     lastTimeSeen: Timestamp = Timestamp.now();
     isConnected: boolean = true;
 

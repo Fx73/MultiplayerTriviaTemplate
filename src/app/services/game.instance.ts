@@ -63,7 +63,15 @@ export class GameInstance {
     onChangeInPlayers(newPlayers: Player[]) {
         console.log('Player received :', newPlayers);
 
+        const currentReadyCount = this.players.filter(p => p.isReady).length;
+        const newReadyCount = newPlayers.filter(p => p.isReady).length;
+
         this.players = newPlayers;
+
+        if (newReadyCount > currentReadyCount) {
+            const audio = new Audio('assets/Sound/cowbell.wav');
+            audio.play();
+        }
 
         const allReady = newPlayers.length > 0 && newPlayers.every(p => p.isReady);
         if (allReady) {

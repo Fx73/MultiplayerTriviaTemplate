@@ -5,7 +5,7 @@
 	<ion-card-content>
 		<ion-list>
 			@for (player of players; track player.id) {
-			<ion-item [class.voted]="player.isReady" class="playerItem">
+			<ion-item [class]="getPlayerStatusClass(player)" class="playerItem">
 				@if (player.id === ownerId) {
 				<ion-icon name="star" slot="start"></ion-icon>
 				} @else {
@@ -13,14 +13,22 @@
 				}
 				{{ player.name }}
 
-				<ion-badge slot="end">
-					{{player.score}}
-				</ion-badge>
+				@if (player.isReady) {
+				<ion-item>
+					<ion-badge color="success" class="ready-indicator">
+						{{ getBadgeIcon(player.answerOrder) }}
+					</ion-badge>
+				</ion-item>
+				}
 				@if (isCurrentlyOwner && player.id !== ownerId) {
 				<ion-button slot="end" color="danger" fill="clear" (click)="kickPlayer(player.id)">
 					<ion-icon name="close-circle"></ion-icon>
 				</ion-button>
 				}
+
+				<ion-badge slot="end">
+					{{player.score}}
+				</ion-badge>
 			</ion-item>
 			} @empty {
 			<ion-item><i>No players found</i></ion-item>

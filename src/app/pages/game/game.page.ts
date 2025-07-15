@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { TriviaItemDTO } from 'src/app/shared/DTO/trivia-item.dto';
 import { UserConfigService } from "src/app/services/userconfig.service";
+import { distance } from 'fastest-levenshtein';
 
 @Component({
   selector: 'app-game',
@@ -82,6 +83,8 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     }
 
     if (state === GameState.GameAnswer) {
+      const audio = new Audio('assets/Sound/trombone.wav');
+      audio.play();
       this.clearCountdown();
       return
     }
@@ -177,11 +180,21 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   checkAnswer(answer: string): boolean {
     if (!this.trivia) return false;
 
-    const userInput = answer.trim().toLowerCase();
-    const correct = this.trivia.answer.trim().toLowerCase();
+    function removeAccents(str: string): string {
+      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
 
-    return userInput === correct;
+    const userInput = removeAccents(answer.toLowerCase());
+    const correct = removeAccents(this.trivia.answer.toLowerCase());
+
+    if (this.gameInstance.lobby.answerStrictness === 0)
+      return userInput === correct;
+    else {
+      const dist = distance(userInput, correct);
+      return dist <= this.gameInstance.lobby.answerStrictness
+    }
   }
+
   //#endregion
 
   //#region EndGame
