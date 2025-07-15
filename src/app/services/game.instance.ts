@@ -42,24 +42,28 @@ export class GameInstance {
     }
 
     onChangeInLobby(newLobby: Lobby) {
-        console.log('Lobby received :', newLobby)
+        console.log('Lobby received :', newLobby);
 
-        if (this.lobby.state != newLobby.state) {
-            this.gameStateSubject$.next(newLobby.state)
-        }
-
+        const previousState = this.lobby?.state;
         this.lobby = newLobby;
+
+        if (previousState !== newLobby.state) {
+            this.gameStateSubject$.next(newLobby.state);
+        }
     }
+
 
     onChangeInPlayers(newPlayers: Player[]) {
-        console.log('Player received :', newPlayers)
-
-        const allReady = newPlayers.length > 0 && newPlayers.every(p => p.isReady);
-        if (allReady)
-            this.allPlayersReadySubject$.next();
+        console.log('Player received :', newPlayers);
 
         this.players = newPlayers;
+
+        const allReady = newPlayers.length > 0 && newPlayers.every(p => p.isReady);
+        if (allReady) {
+            this.allPlayersReadySubject$.next();
+        }
     }
+
 
     leaveGame() {
         this.lobbyService.leaveLobby(this.lobbyCode)

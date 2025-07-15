@@ -48,7 +48,7 @@ export class LobbyPage implements OnInit, OnDestroy {
       this.router.navigateByUrl('home')
       return
     }
-    if (this.gameInstance && this.gameInstance.lobbyCode != this.lobbyCode) {
+    if (this.gameInstance && this.gameInstance.lobbyCode && this.gameInstance.lobbyCode != this.lobbyCode) {
       this.gameInstance.leaveGame()
     }
 
@@ -58,7 +58,7 @@ export class LobbyPage implements OnInit, OnDestroy {
       this.gameInstance = new GameInstance(this.lobbyCode, playerId, playerName, this.lobbyService)
     }
 
-    this.stateSub = this.gameInstance.getGameStateListener().subscribe(state => { if (state != GameState.InLobby) this.router.navigate(['/game']); else this.isLobbyLocked = false; })
+    this.stateSub = this.gameInstance.getGameStateListener().subscribe(state => this.onGameStateChange(state))
   }
 
   async ngOnInit() {
@@ -84,6 +84,14 @@ export class LobbyPage implements OnInit, OnDestroy {
     this.stateSub?.unsubscribe();
   }
 
+  onGameStateChange(state: GameState) {
+    if (state !== GameState.InLobby) {
+      console.log("Trying to navigate to game")
+      this.router.navigate(['/game']);
+    }
+    else
+      this.isLobbyLocked = false;
+  }
 
   updateName<T>(): void {
     this.userConfigService.updateConfig('gameName', this.gameInstance.playerName);

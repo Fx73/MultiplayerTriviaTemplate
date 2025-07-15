@@ -1,4 +1,4 @@
-import { DocumentReference, Firestore, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, increment, onSnapshot, serverTimestamp, setDoc, updateDoc } from '@firebase/firestore';
+import { DocumentReference, Firestore, Query, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, increment, onSnapshot, query, serverTimestamp, setDoc, updateDoc, where, writeBatch } from '@firebase/firestore';
 import { GameState, Lobby } from '../../shared/DTO/lobby';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 
@@ -25,6 +25,16 @@ export class LobbyService {
     this.playerId = this.userConfigService.getConfig()["playerId"]
 
   }
+
+  //#region Queries
+  playersQuery(lobbyCode: string): Query {
+    return query(
+      collection(this.db, this.LOBBY_COLLECTION, lobbyCode, this.PLAYERS_COLLECTION),
+      where('isConnected', '==', true)
+    );
+  }
+  //#endregion
+
 
   //#region "Welcome"
   async lobbyAlreadyExist(lobbyCode: string): Promise<boolean> {
@@ -80,12 +90,17 @@ export class LobbyService {
 
       const playerSnap = await getDoc(playerRef);
       if (playerSnap.exists()) {
-        console.warn("Player already in lobby");
-        this.startHeartbeat(lobbyCode);
-        return true;
+        console.warn("Player already in lobby. Continuing ...");
+        const existingPlayer = playerSnap.data();
+
+        if (existingPlayer['wasKicked'])
+          console.warn("You were removed from this lobby.");
+
+        await updateDoc(playerRef, { isConnected: true, lastTimeSeen: serverTimestamp() });
+      } else {
+        await setDoc(playerRef, { ...player });
       }
 
-      await setDoc(playerRef, { ...player });
       this.startHeartbeat(lobbyCode);
 
       // 👑 Claim ownership if lobby has no owner
@@ -126,7 +141,7 @@ export class LobbyService {
 
     const lobbyData = lobbySnap.data();
     if (this.playerId !== lobbyData['host']) {
-      throw new Error('Not host');
+      throw new Error('Only the host can kick players');
     }
 
     const playerRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode, this.PLAYERS_COLLECTION, targetPlayerId);
@@ -136,7 +151,11 @@ export class LobbyService {
       throw new Error('Player does not exist');
     }
 
-    await deleteDoc(playerRef);
+    await updateDoc(playerRef, {
+      isConnected: false,
+      wasKicked: true,
+      lastTimeSeen: serverTimestamp()
+    });
   }
 
 
@@ -153,41 +172,53 @@ export class LobbyService {
   }
 
   async leaveLobby(lobbyCode: string): Promise<void> {
-    console.log("Leaving Lobby ", lobbyCode)
-    this.stopHeartbeat()
+    console.log("Leaving Lobby ", lobbyCode);
+    this.stopHeartbeat();
 
     const playerRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode, this.PLAYERS_COLLECTION, this.playerId);
+    const playerSnap = await getDoc(playerRef);
 
-    const snap = await getDoc(playerRef);
-    if (!snap.exists()) {
+    if (!playerSnap.exists()) {
       throw new Error('Player not present in lobby');
     }
-    await deleteDoc(playerRef);
+
+    await updateDoc(playerRef, {
+      isConnected: false,
+      lastTimeSeen: serverTimestamp()
+    });
+
 
     const lobbyRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode);
     const lobbySnap = await getDoc(lobbyRef);
-    if (!lobbySnap.exists()) throw new Error('Lobby does not exist')
+    if (!lobbySnap.exists()) throw new Error('Lobby does not exist');
 
     if (lobbySnap.data()['host'] === this.playerId) {
-      const playersSnap = await getDocs(collection(this.db, this.LOBBY_COLLECTION, lobbyCode, this.PLAYERS_COLLECTION));
+      const playersSnap = await getDocs(this.playersQuery(lobbyCode));
+
       if (!playersSnap.empty) {
         const newHostId = playersSnap.docs[0].id;
         await updateDoc(lobbyRef, { host: newHostId });
+      } else {
+        console.log("No connected players available to transfer host.");
       }
     }
+
   }
+
 
   /**
    * LISTENERS
    */
   listenPlayers(lobbyCode: string, callback: (players: Player[]) => void): () => void {
     const playersRef = collection(this.db, this.LOBBY_COLLECTION, lobbyCode, this.PLAYERS_COLLECTION);
+    const connectedPlayersQuery = query(playersRef, where('isConnected', '==', true));
 
-    return onSnapshot(playersRef, (snapshot) => {
+    return onSnapshot(connectedPlayersQuery, (snapshot) => {
       const updated = snapshot.docs.map(doc => doc.data() as Player);
       callback(updated);
     });
   }
+
 
 
 
@@ -230,7 +261,7 @@ export class LobbyService {
       // 📊 Read Lobby and players
       const [lobbySnap, playersSnap] = await Promise.all([
         getDoc(lobbyRef),
-        getDocs(collection(this.db, this.LOBBY_COLLECTION, lobbyCode, this.PLAYERS_COLLECTION))
+        getDocs(this.playersQuery(lobbyCode))
       ]);
 
       if (!lobbySnap.exists()) return;
@@ -247,7 +278,10 @@ export class LobbyService {
         if (targetId != this.playerId && (now - lastSeen.getTime() > 60000)) {
           console.log("Inactive player found. Kicking ...", docSnap)
 
-          await deleteDoc(docSnap.ref);
+          await updateDoc(docSnap.ref, {
+            isConnected: false,
+            lastTimeSeen: serverTimestamp()
+          });
 
           // 👑 If host kick, I take ownership
           if (targetId === lobbyData['host']) {
@@ -289,14 +323,26 @@ export class LobbyService {
       throw new Error('Lobby not found');
     }
 
+    // 🔁 Fetch all players and reset their readiness
+    const playersCollectionRef = collection(this.db, this.LOBBY_COLLECTION, lobbyCode, this.PLAYERS_COLLECTION);
+    const playerSnaps = await getDocs(playersCollectionRef);
+
+    const batch = writeBatch(this.db);
+    playerSnaps.forEach(playerDoc => {
+      batch.update(playerDoc.ref, { isReady: false });
+    });
+    await batch.commit();
+
+    // ⬇️ Update lobby state and question count
     const lobbyData = snap.data() as Lobby;
-    const newQuestionCount = lobbyData.questionCount - 1
-    const newState = lobbyData.questionCount > 0 ? GameState.GameQuestion : GameState.InVictoryRoom
+    const newQuestionCount = lobbyData.questionCount - 1;
+    const newState = newQuestionCount > 0 ? GameState.GameQuestion : GameState.InVictoryRoom;
 
     await updateDoc(lobbyRef, {
       questionCount: newQuestionCount,
       state: newState
     });
+
   }
 
 

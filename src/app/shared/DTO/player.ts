@@ -6,7 +6,7 @@ export class Player {
     score = 0
     isReady = false
     lastTimeSeen: Timestamp = Timestamp.now();
-
+    isConnected: boolean = true;
 
     constructor(id: string, name: string) {
         this.id = id

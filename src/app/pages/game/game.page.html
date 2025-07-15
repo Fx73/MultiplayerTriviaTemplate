@@ -9,7 +9,7 @@
 		<ion-menu contentId="questionTab">
 			<ion-header>
 				<ion-button
-					*ngIf="gameInstance.isOwner && (!gameInstance.lobby.isTimed && gameInstance.lobby.state === GameState.GameQuestion) || gameInstance.lobby.state == GameState.GameAnswer"
+					*ngIf="gameInstance.isOwner && (!gameInstance.lobby.isTimed && gameInstance.lobby.state === GameState.GameQuestion) || gameInstance.lobby.state === GameState.GameAnswer"
 					expand="block" size="large" color="warning" class="btn-next" (click)="onNextPressed()">
 					{{gameInstance.lobby.state === 1 ? 'End time' : 'Next'}}
 				</ion-button>
@@ -20,7 +20,9 @@
 
 		</ion-menu>
 		<div id="questionTab" class="question-tab">
-			<ion-card *ngIf="trivia" class="question-card">
+			<ion-card
+				*ngIf="trivia && (gameInstance.lobby.state === GameState.GameQuestion || gameInstance.lobby.state === GameState.GameAnswer)"
+				class="question-card">
 				<ion-card-header>
 					<ion-card-subtitle *ngIf="trivia.category">
 						{{ trivia.category }} > {{ trivia.subcategory }}
@@ -28,6 +30,10 @@
 					<ion-card-subtitle *ngIf="!trivia.category">
 						No category
 					</ion-card-subtitle>
+					<ion-chip color="primary" class="chip-progress">
+						🎯 {{ gameInstance.lobby.questionList.length - gameInstance.lobby.questionCount + 1 }} /
+						{{ gameInstance.lobby.questionList.length }}
+					</ion-chip>
 					<ion-chip *ngIf="gameInstance.lobby.isTimed" class="chip-countdown">
 						⏱️ {{ gameInstance.lobby.secondsRemaining }}
 					</ion-chip>
@@ -67,8 +73,39 @@
 
 					</div>
 				</ion-card-content>
-
 			</ion-card>
+
+			<ion-card *ngIf="gameInstance.lobby.state === GameState.InVictoryRoom" class="end-screen-card">
+				<ion-card-header>
+					<ion-card-title>🏆 Game Over!</ion-card-title>
+					<ion-card-subtitle>Well played {{ gameInstance.playerName }} 🎉</ion-card-subtitle>
+					<ion-card-title>
+						You scored <strong>{{ getPlayerScore() }}</strong> points !
+						You ranked <strong>#{{ getPlayerRank() }}</strong>
+					</ion-card-title>
+				</ion-card-header>
+
+				<ion-card-content>
+					<ion-list class="leaderboard">
+						@let ranks = sortedPlayers();
+						<ion-list-header>
+							<ion-label>
+								🥇 Leaderboard
+							</ion-label>
+						</ion-list-header>
+
+						<ion-item *ngFor="let p of ranks; index as i">
+							<ion-label>
+								{{ i + 1 }}. {{ p.name }} — {{ p.score }} pts
+							</ion-label>
+						</ion-item>
+					</ion-list>
+					<ion-button expand="block" color="medium" (click)="goBack()" class="btn-back">
+						🏠 Return to Home
+					</ion-button>
+				</ion-card-content>
+			</ion-card>
+
 		</div>
 	</ion-split-pane>
 </ion-content>
