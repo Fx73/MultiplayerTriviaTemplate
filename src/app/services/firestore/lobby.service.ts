@@ -1,13 +1,13 @@
-import { DocumentReference, Firestore, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, onSnapshot, serverTimestamp, setDoc, updateDoc } from '@firebase/firestore';
+import { DocumentReference, Firestore, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, increment, onSnapshot, serverTimestamp, setDoc, updateDoc } from '@firebase/firestore';
+import { GameState, Lobby } from '../../shared/DTO/lobby';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 
-import { AppComponent } from '../app.component';
+import { AppComponent } from '../../app.component';
 import { Injectable } from '@angular/core';
-import { Lobby } from '../shared/DTO/lobby';
-import { Player } from '../shared/DTO/player';
+import { Player } from '../../shared/DTO/player';
 import { UserConfigService } from 'src/app/services/userconfig.service';
-import { UserFirestoreService } from './firestore/user.firestore.service';
-import { WelcomePage } from '../pages/welcome/welcome.page';
+import { UserFirestoreService } from './user.firestore.service';
+import { WelcomePage } from '../../pages/welcome/welcome.page';
 
 @Injectable({
   providedIn: 'root'
@@ -46,38 +46,62 @@ export class LobbyService {
   /**
    * CALLERS
    */
-  async createLobby(lobbyCode: string): Promise<void> {
+  async createLobby(lobbyCode: string): Promise<boolean> {
     console.log("Creating lobby", lobbyCode)
-    const lobbyRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode);
-    const lobby = new Lobby(this.playerId)
-    await setDoc(lobbyRef, { ...lobby });
+    try {
+      if (await this.lobbyAlreadyExist(lobbyCode)) {
+        AppComponent.presentWarningToast("Lobby already exists");
+        return false;
+      }
 
-    const playerName: string = this.userConfigService.getConfig()["gameName"]
-    const player = new Player(this.playerId, playerName)
-    const playerRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode, this.PLAYERS_COLLECTION, this.playerId);
-    await setDoc(playerRef, { ...player });
+      const lobbyRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode);
+      const emptyLobby = new Lobby()
 
-    this.startHeartbeat(lobbyCode)
+      await setDoc(lobbyRef, { ...emptyLobby });
+      return true;
+    } catch (err) {
+      console.error("Error creating lobby:", err);
+      return false;
+    }
   }
 
-  async joinLobby(lobbyCode: string): Promise<void> {
+
+  async joinLobby(lobbyCode: string): Promise<boolean> {
     console.log("Joining lobby", lobbyCode)
-    const lobbyRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode);
-    const snap = await getDoc(lobbyRef);
-    if (!snap.exists()) {
-      throw new Error('Lobby does not exist');
-    }
+    try {
+      if (await this.lobbyDoesNotExist(lobbyCode)) {
+        console.warn("Lobby does not exist");
+        return false;
+      }
 
-    const playerName: string = this.userConfigService.getConfig()["gameName"];
-    const player = new Player(this.playerId, playerName);
-    const playerRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode, this.PLAYERS_COLLECTION, this.playerId);
-    const playerSnap = await getDoc(playerRef);
-    if (playerSnap.exists()) {
-      throw new Error('Player already in lobby');
-    }
-    await setDoc(playerRef, { ...player });
+      const playerName: string = this.userConfigService.getConfig()["gameName"];
+      const player = new Player(this.playerId, playerName);
+      const playerRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode, this.PLAYERS_COLLECTION, this.playerId);
 
-    this.startHeartbeat(lobbyCode)
+      const playerSnap = await getDoc(playerRef);
+      if (playerSnap.exists()) {
+        console.warn("Player already in lobby");
+        this.startHeartbeat(lobbyCode);
+        return true;
+      }
+
+      await setDoc(playerRef, { ...player });
+      this.startHeartbeat(lobbyCode);
+
+      // 👑 Claim ownership if lobby has no owner
+      const lobbyRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode);
+      const lobbySnap = await getDoc(lobbyRef);
+      const lobbyData = lobbySnap.data();
+      if (lobbyData && !lobbyData['host']) {
+        console.log("Claiming lobby ownership", lobbyCode)
+        await updateDoc(lobbyRef, { host: this.playerId });
+      }
+
+      return true;
+    } catch (err) {
+      console.error("Error joining lobby:", err);
+      return false;
+    }
   }
 
   async changePlayerName(lobbyCode: string, newName: string): Promise<void> {
@@ -128,8 +152,6 @@ export class LobbyService {
     await updateDoc(lobbyRef, { [key]: value });
   }
 
-
-
   async leaveLobby(lobbyCode: string): Promise<void> {
     console.log("Leaving Lobby ", lobbyCode)
     this.stopHeartbeat()
@@ -155,11 +177,6 @@ export class LobbyService {
     }
   }
 
-
-  launchGame() {
-
-  }
-
   /**
    * LISTENERS
    */
@@ -180,9 +197,10 @@ export class LobbyService {
     return onSnapshot(lobbyRef, (snapshot) => {
       const data = snapshot.data();
       if (data) {
-        const hydrated = Object.assign(new Lobby(data['host']), {
+        const hydrated = Object.assign(new Lobby(), {
           ...data,
-          createdAt: data['createdAt']?.toDate?.() ?? new Date()
+          createdAt: data['createdAt']?.toDate?.() ?? new Date(),
+          state: data['state'] as GameState
         });
 
         callback(hydrated);
@@ -245,6 +263,42 @@ export class LobbyService {
         console.error('Erreur heartbeat step :', err);
     }
   }
+
+  //#endregion
+
+  //#region Game
+  async playerFoundAnswer(lobbyCode: string): Promise<void> {
+    const playerRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode, this.PLAYERS_COLLECTION, this.playerId);
+    const snap = await getDoc(playerRef);
+
+    if (!snap.exists()) {
+      throw new Error('Player does not exist');
+    }
+
+    await updateDoc(playerRef, {
+      isReady: true,
+      score: increment(1)
+    });
+  }
+
+  async advanceToNextQuestion(lobbyCode: string): Promise<void> {
+    const lobbyRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode);
+    const snap = await getDoc(lobbyRef);
+
+    if (!snap.exists()) {
+      throw new Error('Lobby not found');
+    }
+
+    const lobbyData = snap.data() as Lobby;
+    const newQuestionCount = lobbyData.questionCount - 1
+    const newState = lobbyData.questionCount > 0 ? GameState.GameQuestion : GameState.InVictoryRoom
+
+    await updateDoc(lobbyRef, {
+      questionCount: newQuestionCount,
+      state: newState
+    });
+  }
+
 
   //#endregion
 

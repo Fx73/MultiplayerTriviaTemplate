@@ -1,6 +1,6 @@
 <app-header title="Welcome into the Lobby"></app-header>
 <ion-content [fullscreen]="true">
-	<ion-grid *ngIf="lobby">
+	<ion-grid>
 		<ion-row>
 			<ion-col>
 				<ion-card class="cardContainer">
@@ -11,17 +11,19 @@
 						<ion-icon (click)="copyToClipboard()" size="large" class="lobbyCodeItem"
 							name="clipboard"></ion-icon>
 						<ion-card-title>Set your name !</ion-card-title>
-						<ion-input [(ngModel)]="playerName" label="You are :" fill="outline" label-placement="floating">
+						<ion-input [(ngModel)]="gameInstance.playerName" label="You are :" fill="outline"
+							label-placement="floating" [disabled]="isLobbyLocked">
 						</ion-input>
-						<ion-button (click)="updateName()" class="okBtn">
+						<ion-button (click)="updateName()" class="okBtn" [disabled]="isLobbyLocked">
 							OK
 						</ion-button>
 					</ion-card-header>
 				</ion-card>
 			</ion-col>
 			<ion-col>
-				<app-players-card [players]="players" [ownerId]="lobby.host" [isCurrentlyOwner]="isOwner"
-					(eventKickPlayer)="onKickPlayerFromLobby($event)"></app-players-card>
+				<app-players-card [players]="gameInstance.players" [ownerId]="gameInstance.lobby.host"
+					[isCurrentlyOwner]="gameInstance.isOwner"
+					(eventKickPlayer)="gameInstance.onKickPlayer($event)"></app-players-card>
 			</ion-col>
 			<ion-col>
 				<ion-card class="cardContainer">
@@ -30,34 +32,47 @@
 					</ion-card-header>
 					<ion-card-content class="cardListCentered">
 						<ion-item>
-							<ion-input label="Question count" type="number" [(ngModel)]="questionCount"
-								(ionBlur)="onQuestionCountChange()" placeholder="ex: 10" min="1" max="50"
-								inputmode="numeric">
+							<ion-input label="Question count" type="number" [value]="gameInstance.lobby.questionCount"
+								(ionChange)="onLobbyValueModified('questionCount',$event.target.value)"
+								placeholder="ex: 10" min="1" max="50" inputmode="numeric" [disabled]="isLobbyLocked">
 							</ion-input>
 						</ion-item>
 
 						<ion-item>
-							<ion-label>Catégorie</ion-label>
-							<ion-select [(ngModel)]="lobby.category" (ionChange)="onCategorySelect()"
-								interface="popover">
+							<ion-select label="Category" [value]="gameInstance.lobby.category"
+								(ionChange)="onCategorySelect($event.target.value)" interface="popover"
+								[disabled]="isLobbyLocked">
 								<ion-select-option [value]="null">No category</ion-select-option>
 								<ion-select-option *ngFor="let category of categoryList" [value]="category">
 									{{ category }}
 								</ion-select-option>
 							</ion-select>
 						</ion-item>
-						<ion-item *ngIf="lobby.category">
-							<ion-label>Sous-catégorie</ion-label>
-							<ion-select [(ngModel)]="lobby.subcategory" interface="popover"
-								(ionChange)="onSubcategorySelect()">
+						<ion-item *ngIf="gameInstance.lobby.category">
+							<ion-select label="SubCategory" [value]="gameInstance.lobby.subcategory" interface="popover"
+								(ionChange)="onLobbyValueModified('subcategory',$event.target.value)"
+								[disabled]="isLobbyLocked">
 								<ion-select-option [value]="null">No category</ion-select-option>
 								<ion-select-option *ngFor="let sub of subcategoryList" [value]="sub">
 									{{ sub }}
 								</ion-select-option>
 							</ion-select>
 						</ion-item>
-						<ion-button [disabled]="!isOwner" size="large" fill="outline" expand="block"
-							style="margin-top: 10px;">
+						<ion-item>
+							<ion-toggle [checked]="gameInstance.lobby.isTimed"
+								(ionChange)="onLobbyValueModified('isTimed',$event.detail.checked)" color="tertiary">
+								{{gameInstance.lobby.isTimed ? 'Timer Mode' : 'Manual Mode'}}
+							</ion-toggle>
+						</ion-item>
+						<ion-item *ngIf="gameInstance.lobby.isTimed">
+							<ion-input label="Timer (seconds)" labelPlacement="stacked" type="number"
+								[value]="gameInstance.lobby.timerDuration"
+								(ionChange)="onLobbyValueModified('timerDuration',$event.target.value)" min="10"
+								max="600" placeholder="e.g. 60"></ion-input>
+						</ion-item>
+
+						<ion-button [disabled]="!gameInstance.isOwner || isLobbyLocked" size="large" fill="outline"
+							expand="block" style="margin-top: 10px;" (click)="onStartPressed()">
 							Launch
 						</ion-button>
 					</ion-card-content>

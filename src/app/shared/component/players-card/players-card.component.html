@@ -13,6 +13,9 @@
 				}
 				{{ player.name }}
 
+				<ion-badge slot="end">
+					{{player.score}}
+				</ion-badge>
 				@if (isCurrentlyOwner && player.id !== ownerId) {
 				<ion-button slot="end" color="danger" fill="clear" (click)="kickPlayer(player.id)">
 					<ion-icon name="close-circle"></ion-icon>

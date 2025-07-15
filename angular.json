@@ -40,7 +40,6 @@
             ],
             "styles": [
               "src/global.scss",
-              "src/theme/variables.scss",
               "src/theme/components.scss"
             ],
             "scripts": [],
@@ -118,7 +117,6 @@
             ],
             "styles": [
               "src/global.scss",
-              "src/theme/variables.scss",
               "src/theme/components.scss"
             ],
             "scripts": []

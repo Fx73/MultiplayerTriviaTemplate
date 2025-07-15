@@ -1,4 +1,4 @@
-import { Firestore, addDoc, collection, deleteDoc, deleteField, doc, documentId, getDoc, getDocs, getFirestore, limit, orderBy, query, setDoc, startAfter, updateDoc, where } from 'firebase/firestore';
+import { Firestore, QueryConstraint, addDoc, collection, deleteDoc, deleteField, doc, documentId, getDoc, getDocs, getFirestore, limit, orderBy, query, setDoc, startAfter, updateDoc, where } from 'firebase/firestore';
 
 import { AppComponent } from 'src/app/app.component';
 import { FirestoreConverter } from './firestore.converter';
@@ -101,11 +101,11 @@ export class ItemFirestoreService {
             if (docSnap.exists()) {
                 return docSnap.data();
             } else {
-                console.warn(`Document ${documentId} does not exist!`);
+                AppComponent.presentWarningToast(`Document ${documentId} does not exist!`);
                 return null;
             }
         } catch (error) {
-            console.error('Error retrieving item:', error);
+            AppComponent.presentErrorToast('Error retrieving item: ' + error);
             throw error;
         }
     }
@@ -131,78 +131,31 @@ export class ItemFirestoreService {
         return items;
     }
 
-
-    async GetAllItems(lastitemId: string | null): Promise<TriviaItemDTO[]> {
-        const userId = this.userFirestoreService.getUserData()?.id;
-
-        const items: TriviaItemDTO[] = [];
-        const itemRef = collection(this.db, this.TRIVIA_COLLECTION).withConverter(this.firestoreConverterTriviaItem);;
-
-        let q;
-
-        if (lastitemId) {
-            q = query(
-                itemRef,
-                orderBy(documentId()),
-                startAfter(lastitemId),
-                limit(this.BATCH_SIZE)
-            );
-        } else {
-            q = query(
-                itemRef,
-                orderBy(documentId()),
-                limit(this.BATCH_SIZE)
-            );
-        }
-
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty)
-            throw new Error("No more items to fetch");
-
-        querySnapshot.forEach((doc) => {
-            items.push(doc.data());
-        });
-
-        return items;
-    }
-
-    async GetAllItemsWithSearch(lastitemId: string | null, searchTerm: string): Promise<TriviaItemDTO[]> {
-        const userId = this.userFirestoreService.getUserData()?.id;
-        const items: TriviaItemDTO[] = [];
+    async GetAllItems(lastItemId: string | null, searchTerm?: string): Promise<TriviaItemDTO[]> {
         const itemRef = collection(this.db, this.TRIVIA_COLLECTION).withConverter(this.firestoreConverterTriviaItem);
+        const constraints: QueryConstraint[] = [];
 
-        let q;
-        if (lastitemId) {
-            q = query(
-                itemRef,
-                where('title', ">=", searchTerm),
-                where('title', "<", searchTerm + "z"),
-                orderBy(documentId()),
-                startAfter(lastitemId),
-                limit(this.BATCH_SIZE)
-            );
-        } else {
-            q = query(
-                itemRef,
-                where('title', ">=", searchTerm),
-                where('title', "<", searchTerm + "z"),
-                orderBy(documentId()),
-                limit(this.BATCH_SIZE)
-            );
+        // 🔍 Optional title-based search
+        if (searchTerm) {
+            constraints.push(where('answer', '>=', searchTerm));
+            constraints.push(where('answer', '<', searchTerm + 'z'));
         }
 
+        // 📍 Pagination setup
+        constraints.push(orderBy('answer'));
+        if (lastItemId) constraints.push(startAfter(lastItemId));
+        constraints.push(limit(this.BATCH_SIZE));
+
+        const q = query(itemRef, ...constraints);
         const querySnapshot = await getDocs(q);
 
-        if (querySnapshot.empty)
+        if (querySnapshot.empty) {
             throw new Error("No more items to fetch");
+        }
 
-        querySnapshot.forEach((doc) => {
-            items.push(doc.data());
-        });
-
-        return items;
+        return querySnapshot.docs.map(doc => doc.data());
     }
+
 
 
 
@@ -306,6 +259,30 @@ export class ItemFirestoreService {
         await updateDoc(ref, {
             [`category.${category}`]: updated
         });
+    }
+
+    //#endregion
+
+    //#region Game
+    async getRandomQuestionIds(count: number, category: string | null = null, subcategory: string | null = null): Promise<string[]> {
+        let queryRef = collection(this.db, this.TRIVIA_COLLECTION);
+
+        const constraints: QueryConstraint[] = [];
+
+        if (category)
+            constraints.push(where('category', '==', category));
+
+        if (subcategory)
+            constraints.push(where('subcategory', '==', subcategory));
+
+
+        //Todo : Scale
+        const querySnapshot = await getDocs(query(queryRef, ...constraints));
+        const allIds = querySnapshot.docs.map(doc => doc.id);
+
+
+        const shuffled = allIds.sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, count);
     }
 
     //#endregion

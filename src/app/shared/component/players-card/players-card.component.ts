@@ -15,7 +15,7 @@ import { addIcons } from 'ionicons';
 
 export class PlayersCardComponent {
   @Input()
-  ownerId!: string
+  ownerId!: string | null
 
   @Input()
   players!: Player[]

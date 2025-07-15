@@ -25,7 +25,6 @@ export class UserConfigService {
         }
 
         this.configSubject = new BehaviorSubject<UserConfig>(finalConfig);
-        console.log({ ...defaultConfig, ...storedConfig }.playerId)
     }
 
 

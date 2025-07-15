@@ -42,11 +42,8 @@ export class BrowsePage implements OnInit {
   }
 
   async updateItems(lastItemId: string | null, resetList = false) {
-    let newItems: TriviaItemDTO[]
-    if (this.searchQuery)
-      newItems = await this.itemFirestoreService.GetAllItemsWithSearch(lastItemId, this.searchQuery);
-    else
-      newItems = await this.itemFirestoreService.GetAllItems(lastItemId);
+    const newItems: TriviaItemDTO[] = await this.itemFirestoreService.GetAllItems(lastItemId, this.searchQuery);
+
     if (resetList)
       this.items = newItems
     else

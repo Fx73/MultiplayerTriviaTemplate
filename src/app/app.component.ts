@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
+import { GameInstance } from './services/game.instance';
 import { ToastController } from '@ionic/angular';
 
 @Component({
@@ -11,6 +12,7 @@ import { ToastController } from '@ionic/angular';
 })
 export class AppComponent implements OnInit {
   static appInstance: AppComponent;
+  static gameInstance: GameInstance;
 
   constructor(private toastController: ToastController) {
     AppComponent.appInstance = this;

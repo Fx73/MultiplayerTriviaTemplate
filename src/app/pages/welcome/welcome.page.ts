@@ -5,7 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
-import { LobbyService } from 'src/app/services/lobby.service';
+import { LobbyService } from 'src/app/services/firestore/lobby.service';
 import { LoginComponent } from "../../shared/user/login/login.component";
 import { UserConfigService } from 'src/app/services/userconfig.service';
 import { UserDto } from '../user-profile/user.dto';

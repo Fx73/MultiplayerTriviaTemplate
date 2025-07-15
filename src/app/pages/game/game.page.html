@@ -4,4 +4,71 @@
 	</ion-toolbar>
 </ion-header>
 
-<div>Game Page</div>
+<ion-content>
+	<ion-split-pane when="xs" contentId="questionTab">
+		<ion-menu contentId="questionTab">
+			<ion-header>
+				<ion-button
+					*ngIf="gameInstance.isOwner && (!gameInstance.lobby.isTimed && gameInstance.lobby.state === GameState.GameQuestion) || gameInstance.lobby.state == GameState.GameAnswer"
+					expand="block" size="large" color="warning" class="btn-next" (click)="onNextPressed()">
+					{{gameInstance.lobby.state === 1 ? 'End time' : 'Next'}}
+				</ion-button>
+				<app-players-card [players]="gameInstance.players" [ownerId]="gameInstance.lobby.host"
+					[isCurrentlyOwner]="gameInstance.isOwner"
+					(eventKickPlayer)="gameInstance.onKickPlayer($event)"></app-players-card>
+			</ion-header>
+
+		</ion-menu>
+		<div id="questionTab" class="question-tab">
+			<ion-card *ngIf="trivia" class="question-card">
+				<ion-card-header>
+					<ion-card-subtitle *ngIf="trivia.category">
+						{{ trivia.category }} > {{ trivia.subcategory }}
+					</ion-card-subtitle>
+					<ion-card-subtitle *ngIf="!trivia.category">
+						No category
+					</ion-card-subtitle>
+					<ion-chip *ngIf="gameInstance.lobby.isTimed" class="chip-countdown">
+						⏱️ {{ gameInstance.lobby.secondsRemaining }}
+					</ion-chip>
+					<ion-card-title>{{ trivia.question }}</ion-card-title>
+				</ion-card-header>
+
+				<ion-card-content *ngIf="gameInstance.lobby.state === GameState.GameQuestion">
+					<ion-item>
+						<ion-input type="text" [(ngModel)]="userAnswer" placeholder="Type your response..."
+							[disabled]="answerIsCorrect" inputmode="text"></ion-input>
+					</ion-item>
+					<ion-button expand="block" (click)="submitAnswer()" [disabled]="!userAnswer.trim()">
+						Submit
+					</ion-button>
+					<div *ngFor="let msg of floatingAnswerList" [ngStyle]="{ left: msg.left }"
+						[ngClass]="answerIsCorrect ? 'floating-yes' : 'floating-no'">
+						{{answerIsCorrect ? 'Yes' : 'No'}}</div>
+				</ion-card-content>
+
+				<ion-card-content *ngIf="gameInstance.lobby.state === GameState.GameAnswer">
+					<ion-item class="item-answer">
+						<ion-label>{{ trivia.answer }}</ion-label>
+					</ion-item>
+
+					<div class="chip-feedback">
+						@if (answerIsCorrect) {
+						<ion-chip color="success">
+							<h2>Well done {{ gameInstance.playerName }} 🎉 &nbsp;</h2>
+							<p>You got it right!</p>
+						</ion-chip>
+						} @else {
+						<ion-chip color="danger">
+							<h2>Nice try {{ gameInstance.playerName }} 🙌 &nbsp;</h2>
+							<p>You will do better, maybe!</p>
+						</ion-chip>
+						}
+
+					</div>
+				</ion-card-content>
+
+			</ion-card>
+		</div>
+	</ion-split-pane>
+</ion-content>

@@ -1,3 +1,4 @@
+import { GameGuard } from './shared/guard/game.guard';
 import { Routes } from '@angular/router';
 import { UserGuard } from './shared/guard/user.guard';
 
@@ -17,7 +18,8 @@ export const routes: Routes = [
   },
   {
     path: 'game',
-    loadComponent: () => import('./pages/game/game.page').then(m => m.GamePage)
+    loadComponent: () => import('./pages/game/game.page').then(m => m.GamePage),
+    canActivate: [GameGuard]
   },
   {
     path: 'options',
