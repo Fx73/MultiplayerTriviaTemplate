@@ -1,6 +1,6 @@
 # Multiplayer Trive Template
 
-[IM2AG](https://img.shields.io/badge/IM2AG-Seal%20of%20Quality-blue)
+![IM2AG](https://img.shields.io/badge/IM2AG-Seal%20of%20Quality-blue)
 
 Welcome to **Multiplayer Trive Template**, a web application that challenges users with fast-paced quiz questions.
 
@@ -20,7 +20,7 @@ Welcome to **Multiplayer Trive Template**, a web application that challenges use
 | Angular    | App framework                     |
 | Ionic      | UI components & responsive design |
 | TypeScript | Code language                     |
-| Firebase   | Users                             |
+| Firebase   | Game synch                        |
 | SCSS       | Styling                           |
 
 ## 📁 Project Structure
