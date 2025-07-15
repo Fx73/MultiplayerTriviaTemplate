@@ -12,6 +12,7 @@ import { ItemFirestoreService } from 'src/app/services/firestore/item.firestore.
 import { LobbyService } from 'src/app/services/firestore/lobby.service';
 import { PlayersCardComponent } from 'src/app/shared/component/players-card/players-card.component';
 import { Subscription } from 'rxjs';
+import { SystemMessageProvider } from 'src/app/shared/system-message-provider';
 import { UserConfigService } from 'src/app/services/userconfig.service';
 import { addIcons } from 'ionicons';
 import { clipboard } from 'ionicons/icons';
@@ -130,8 +131,12 @@ export class LobbyPage implements OnInit, OnDestroy {
     }
 
     await this.lobbyService.updateLobby(this.lobbyCode, 'questionList', questions)
-    await this.lobbyService.updateLobby(this.lobbyCode, 'state', GameState.GameQuestion)
+    await this.lobbyService.sendSystemMessage(this.lobbyCode, SystemMessageProvider.get('gameStart'));
 
+    // ⏳ Delay before transitioning
+    setTimeout(async () => {
+      await this.lobbyService.updateLobby(this.lobbyCode, 'state', GameState.GameQuestion);
+    }, 2000);
   }
 
 

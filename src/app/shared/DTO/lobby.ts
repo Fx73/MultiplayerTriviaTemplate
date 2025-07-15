@@ -9,6 +9,7 @@ export class Lobby {
     state: GameState = GameState.InLobby;
     questionList: string[] = []
     secondsRemaining: number = 0
+    systemMessage?: string;
 
     constructor() {
     }

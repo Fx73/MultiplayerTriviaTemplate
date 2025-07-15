@@ -1,6 +1,7 @@
 import { BehaviorSubject, Observable, Subject } from "rxjs"
 import { GameState, Lobby } from "../shared/DTO/lobby"
 
+import { AppComponent } from "../app.component"
 import { LobbyService } from "./firestore/lobby.service"
 import { Player } from "../shared/DTO/player"
 
@@ -45,10 +46,16 @@ export class GameInstance {
         console.log('Lobby received :', newLobby);
 
         const previousState = this.lobby?.state;
+        const previousMessage = this.lobby?.systemMessage;
+
         this.lobby = newLobby;
 
         if (previousState !== newLobby.state) {
             this.gameStateSubject$.next(newLobby.state);
+        }
+
+        if (newLobby.systemMessage && newLobby.systemMessage !== previousMessage) {
+            AppComponent.presentPrimaryToast(newLobby.systemMessage);
         }
     }
 

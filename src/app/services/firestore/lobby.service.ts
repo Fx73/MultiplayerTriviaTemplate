@@ -5,9 +5,8 @@ import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { AppComponent } from '../../app.component';
 import { Injectable } from '@angular/core';
 import { Player } from '../../shared/DTO/player';
+import { SystemMessageProvider } from 'src/app/shared/system-message-provider';
 import { UserConfigService } from 'src/app/services/userconfig.service';
-import { UserFirestoreService } from './user.firestore.service';
-import { WelcomePage } from '../../pages/welcome/welcome.page';
 
 @Injectable({
   providedIn: 'root'
@@ -18,12 +17,13 @@ export class LobbyService {
 
   db: Firestore
   playerId: string
+  playerName: string
   heartbeatInterval: any;
 
-  constructor(private userConfigService: UserConfigService) {
+  constructor(userConfigService: UserConfigService) {
     this.db = getFirestore()
-    this.playerId = this.userConfigService.getConfig()["playerId"]
-
+    this.playerId = userConfigService.getConfig()["playerId"]
+    this.playerName = userConfigService.getConfig()["gameName"]
   }
 
   //#region Queries
@@ -84,8 +84,7 @@ export class LobbyService {
         return false;
       }
 
-      const playerName: string = this.userConfigService.getConfig()["gameName"];
-      const player = new Player(this.playerId, playerName);
+      const player = new Player(this.playerId, this.playerName);
       const playerRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode, this.PLAYERS_COLLECTION, this.playerId);
 
       const playerSnap = await getDoc(playerRef);
@@ -94,7 +93,9 @@ export class LobbyService {
         const existingPlayer = playerSnap.data();
 
         if (existingPlayer['wasKicked'])
-          console.warn("You were removed from this lobby.");
+          await this.sendSystemMessage(lobbyCode, "is trying to join again after having been kicked." + SystemMessageProvider.get('rejoinAfterKicked'));
+        else
+          await this.sendSystemMessage(lobbyCode, SystemMessageProvider.get('rejoin'));
 
         await updateDoc(playerRef, { isConnected: true, lastTimeSeen: serverTimestamp() });
       } else {
@@ -109,6 +110,7 @@ export class LobbyService {
       const lobbyData = lobbySnap.data();
       if (lobbyData && !lobbyData['host']) {
         console.log("Claiming lobby ownership", lobbyCode)
+        await this.sendSystemMessage(lobbyCode, SystemMessageProvider.get('hostChange'));
         await updateDoc(lobbyRef, { host: this.playerId });
       }
 
@@ -126,8 +128,8 @@ export class LobbyService {
     if (!snap.exists()) {
       throw new Error('Player not present in lobby');
     }
-
     await updateDoc(playerRef, { name: newName });
+    this.playerName = newName
   }
 
   async kickPlayer(lobbyCode: string, targetPlayerId: string): Promise<void> {
@@ -156,6 +158,8 @@ export class LobbyService {
       wasKicked: true,
       lastTimeSeen: serverTimestamp()
     });
+
+    await this.sendSystemMessage(lobbyCode, SystemMessageProvider.get("kick"));
   }
 
 
@@ -202,8 +206,33 @@ export class LobbyService {
         console.log("No connected players available to transfer host.");
       }
     }
-
+    await this.sendSystemMessage(lobbyCode, SystemMessageProvider.get('disconnect'));
   }
+
+  async sendSystemMessage(lobbyCode: string, message: string, durationMs: number = 5000): Promise<void> {
+    const lobbyRef = doc(this.db, this.LOBBY_COLLECTION, lobbyCode);
+
+    const lobbySnap = await getDoc(lobbyRef);
+    if (!lobbySnap.exists()) throw new Error("Lobby not found");
+
+    message = this.playerName + " : " + message
+
+    // Send system message
+    await updateDoc(lobbyRef, {
+      systemMessage: message,
+      systemMessageTimestamp: serverTimestamp()
+    });
+
+    // Auto-clear after duration
+    setTimeout(async () => {
+      // Optional: check if message is still the same before clearing
+      const currentSnap = await getDoc(lobbyRef);
+      if (currentSnap.exists() && currentSnap.data()['systemMessage'] === message) {
+        await updateDoc(lobbyRef, { systemMessage: null });
+      }
+    }, durationMs);
+  }
+
 
 
   /**
@@ -286,6 +315,7 @@ export class LobbyService {
           // 👑 If host kick, I take ownership
           if (targetId === lobbyData['host']) {
             console.log("Kicked player was owner. Trying to steal ownership !")
+            await this.sendSystemMessage(lobbyCode, SystemMessageProvider.get('hostChange'));
             await updateDoc(lobbyRef, { host: this.playerId });
           }
         }

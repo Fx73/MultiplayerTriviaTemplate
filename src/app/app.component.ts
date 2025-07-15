@@ -25,6 +25,15 @@ export class AppComponent implements OnInit {
 
 
   //#region Toasts
+  async presentPrimaryToast(message: string) {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 6000,
+      color: 'primary'
+    });
+    toast.present();
+  }
+
   async presentOkToast(message: string) {
     const toast = await this.toastController.create({
       message: message,
@@ -50,6 +59,11 @@ export class AppComponent implements OnInit {
       color: 'danger'
     });
     toast.present();
+  }
+
+  static presentPrimaryToast(message: string) {
+    console.log(message)
+    AppComponent.appInstance.presentPrimaryToast(message)
   }
 
   static presentOkToast(message: string) {
