@@ -54,7 +54,6 @@ export class PlayersCardComponent {
   }
 
   kickPlayer(playerId: string) {
-    console.log("trying to kick : ", playerId)
     this.eventKickPlayer.emit(playerId);
   }
 

@@ -61,7 +61,6 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     const remaining = instance.lobby!.questionCount;
 
     if (remaining <= 0) {
-      console.warn("No more question");
       return;
     }
 
@@ -72,15 +71,25 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   onStateChange(state: GameState): void {
     if (state === GameState.GameQuestion) {
       this.answerIsCorrect = false;
-      this.userAnswer = ''
+      this.userAnswer = '';
       this.loadCurrentQuestion();
 
-      if (this.gameInstance.lobby.isTimed && this.gameInstance.isOwner) {
+      if (this.gameInstance.lobby.isTimed) {
         const duration = this.gameInstance.lobby.timerDuration;
-        this.startCountdown(duration);
+        const startedAt = this.gameInstance.lobby.questionStartAt;
+
+        if (startedAt) {
+          const now = Date.now();
+          const secondsElapsed = Math.floor((now - startedAt.toMillis()) / 1000);
+          const secondsRemaining = Math.max(duration - secondsElapsed, 0);
+
+          this.startCountdown(secondsRemaining);
+        } else {
+          this.startCountdown(duration);
+        }
       }
-      return
     }
+
 
     if (state === GameState.GameAnswer) {
       const audio = new Audio('assets/Sound/trombone.wav');
@@ -96,7 +105,6 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onNextPressed(): void {
-    console.log("Next was asked")
     const lobby = this.gameInstance.lobby;
     const code = this.gameInstance.lobbyCode;
 
@@ -121,8 +129,6 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
     this.countdownInterval = setInterval(() => {
       this.countdown--;
-      this.lobbyService.updateLobby(this.gameInstance.lobbyCode, 'secondsRemaining', this.countdown);
-
       if (this.countdown <= 0) {
         this.clearCountdown();
         this.onNextPressed()

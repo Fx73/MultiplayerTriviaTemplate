@@ -87,7 +87,6 @@ export class LobbyPage implements OnInit, OnDestroy {
 
   onGameStateChange(state: GameState) {
     if (state !== GameState.InLobby) {
-      console.log("Trying to navigate to game")
       this.router.navigate(['/game']);
     }
     else

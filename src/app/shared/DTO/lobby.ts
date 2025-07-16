@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore"
+
 export class Lobby {
     host: string | null = null
     category: string | null = null
@@ -9,7 +11,7 @@ export class Lobby {
     createdAt: Date = new Date()
     state: GameState = GameState.InLobby;
     questionList: string[] = []
-    secondsRemaining: number = 0
+    questionStartAt?: Timestamp;
     systemMessage?: string;
 
     constructor() {

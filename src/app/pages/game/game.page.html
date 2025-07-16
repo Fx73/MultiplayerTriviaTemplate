@@ -35,7 +35,7 @@
 						{{ gameInstance.lobby.questionList.length }}
 					</ion-chip>
 					<ion-chip *ngIf="gameInstance.lobby.isTimed" class="chip-countdown">
-						⏱️ {{ gameInstance.lobby.secondsRemaining }}
+						⏱️ {{ countdown }}
 					</ion-chip>
 					<ion-card-title>{{ trivia.question }}</ion-card-title>
 				</ion-card-header>
