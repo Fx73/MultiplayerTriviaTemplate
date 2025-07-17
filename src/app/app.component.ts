@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import { IonApp, IonRouterOutlet, ToastController } from '@ionic/angular/standalone';
 
 import { GameInstance } from './services/game.instance';
-import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-root',

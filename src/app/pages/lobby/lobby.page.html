@@ -71,15 +71,10 @@
 								max="600" placeholder="e.g. 60"></ion-input>
 						</ion-item>
 						<ion-item>
-							<ion-toggle [checked]="gameInstance.lobby.answerStrictness!== 0"
-								(ionChange)="onLobbyValueModified('answerStrictness',$event.detail.checked ? 1 : 0)">
-								Answer flexibility
-							</ion-toggle>
-						</ion-item>
-						<ion-item *ngIf="gameInstance.lobby.answerStrictness !== 0">
-							<ion-range label="Flexibility Level" aria-label="Flexibility Level" label-placement="fixed"
-								[ticks]="true" [snaps]="true" [min]="1" [max]="5" [pin]="true"
-								[pinFormatter]="pinFormatter" [value]="gameInstance.lobby.answerStrictness"
+							<ion-label>Flexibility</ion-label>
+							<ion-range aria-label="Flexibility Level" label-placement="fixed" [ticks]="true"
+								[snaps]="true" [min]="0" [max]="5" [pin]="true" [pinFormatter]="pinFormatter"
+								[value]="gameInstance.lobby.answerStrictness"
 								(ionChange)="onLobbyValueModified('answerStrictness',$event.detail.value)"></ion-range>
 							<ion-icon slot="end" name="help-circle-outline"
 								title="Level is the Levenshtein distance. If you're unsure, pick 2 for one letter swap allowed"></ion-icon>
