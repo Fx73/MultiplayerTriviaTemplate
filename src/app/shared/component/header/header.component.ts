@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
+import { IonButtons, IonHeader, IonTitle, IonToolbar, PopoverController } from '@ionic/angular/standalone';
 
-import { PopoverController } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
 import { UserComponent } from '../../user/user.component';
 
@@ -9,7 +9,7 @@ import { UserComponent } from '../../user/user.component';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   standalone: true,
-  imports: [RouterModule, UserComponent, RouterModule]
+  imports: [IonTitle, IonHeader, IonToolbar, IonButtons, RouterModule, UserComponent, RouterModule]
 })
 export class HeaderComponent {
 

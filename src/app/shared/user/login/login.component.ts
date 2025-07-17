@@ -1,6 +1,7 @@
 import { CommonModule, NgIf } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonIcon, IonInput, IonItem, IonLabel, IonTab, IonTabs, IonTitle } from "@ionic/angular/standalone";
 import { keyOutline, logInOutline, logoGoogle, personAddOutline, refreshCircleOutline } from 'ionicons/icons';
 
 import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service';
@@ -12,7 +13,7 @@ import { addIcons } from 'ionicons';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, NgIf],
+  imports: [IonInput, IonItem, IonLabel, IonTitle, IonCardSubtitle, IonTab, IonCard, IonButton, IonTabs, IonCardContent, IonCardTitle, IonIcon, IonCardHeader, CommonModule, FormsModule, ReactiveFormsModule, RouterModule, NgIf],
 })
 export class LoginComponent {
   @Input()

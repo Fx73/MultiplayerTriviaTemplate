@@ -79,18 +79,21 @@
     <div id="item-list">
       <ion-searchbar [debounce]="1000" (ionInput)="onSearch($event)" show-clear-button="focus"
         style="background-color:white"></ion-searchbar>
-      <div class="cardList">
-        <!-- Item cards -->
-        <ion-card *ngFor="let item of items" (click)="select(item)" class="note-card"
-          [ngClass]="{ selectedCard: selectedItem?.id === item.id, ownedCard: item.owner === userId  }">
-          <ion-card-header>
-            <ion-card-title>{{ item.answer }}</ion-card-title>
-            <ion-card-subtitle *ngIf="item.owner"> {{ ownerNameList.get(item.owner) ?? 'Unknown' }} </ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            {{ item.question }}
-          </ion-card-content>
-        </ion-card>
+      <div style="height: 95%;overflow-y: scroll;">
+        <div class="cardList">
+          <!-- Item cards -->
+          <ion-card *ngFor="let item of items" (click)="select(item)" class="note-card"
+            [ngClass]="{ selectedCard: selectedItem?.id === item.id, ownedCard: item.owner === userId  }">
+            <ion-card-header>
+              <ion-card-title>{{ item.answer }}</ion-card-title>
+              <ion-card-subtitle *ngIf="item.owner"> {{ ownerNameList.get(item.owner) ?? 'Unknown' }}
+              </ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              {{ item.question }}
+            </ion-card-content>
+          </ion-card>
+        </div>
       </div>
       <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
         <ion-infinite-scroll-content></ion-infinite-scroll-content>

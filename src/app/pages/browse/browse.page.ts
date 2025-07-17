@@ -52,11 +52,7 @@ export class BrowsePage implements OnInit {
       this.items.map(item => item.owner).filter(id => id !== undefined)
     )) as string[];
 
-    this.updateOwnerMap(ownerIds)
-  }
-
-  async updateOwnerMap(newOwnerIds: string[]): Promise<void> {
-    const missingIds = newOwnerIds.filter(id => !this.ownerNameList.has(id));
+    const missingIds = ownerIds.filter(id => !this.ownerNameList.has(id));
     if (missingIds.length > 0) {
       const freshMap = await this.userFirestoreService.getUserNameMap(missingIds);
       freshMap.forEach((name, id) => {
