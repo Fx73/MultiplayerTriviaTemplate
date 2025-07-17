@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
 
 import { GradeComponent } from './grade.component';
 
@@ -9,8 +8,8 @@ describe('GradeComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ GradeComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [GradeComponent],
+      imports: []
     }).compileComponents();
 
     fixture = TestBed.createComponent(GradeComponent);

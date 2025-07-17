@@ -3,7 +3,6 @@ import { Component, Input } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { keyOutline, logInOutline, logoGoogle, personAddOutline, refreshCircleOutline } from 'ionicons/icons';
 
-import { IonicModule } from '@ionic/angular';
 import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service';
 import { RouterModule } from '@angular/router';
 import { addIcons } from 'ionicons';
@@ -13,7 +12,7 @@ import { addIcons } from 'ionicons';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, RouterModule, NgIf],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, NgIf],
 })
 export class LoginComponent {
   @Input()

@@ -8,7 +8,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GameInstance } from './../../services/game.instance';
 import { HeaderComponent } from 'src/app/shared/component/header/header.component';
-import { IonicModule } from '@ionic/angular';
 import { ItemFirestoreService } from 'src/app/services/firestore/item.firestore.service';
 import { LobbyService } from 'src/app/services/firestore/lobby.service';
 import { PlayersCardComponent } from 'src/app/shared/component/players-card/players-card.component';
@@ -22,7 +21,7 @@ import { addIcons } from 'ionicons';
   templateUrl: './lobby.page.html',
   styleUrls: ['./lobby.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, HeaderComponent, PlayersCardComponent],
+  imports: [CommonModule, FormsModule, HeaderComponent, PlayersCardComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class LobbyPage implements OnInit, OnDestroy {

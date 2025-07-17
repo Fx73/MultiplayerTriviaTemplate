@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { IonicModule, PopoverController } from '@ionic/angular';
+import { IonButton, IonContent, IonIcon, IonItem, IonLabel, IonPopover, PopoverController } from "@ionic/angular/standalone";
 import { logoGoogle, person } from 'ionicons/icons';
 
 import { LoginComponent } from './login/login.component';
@@ -14,7 +14,7 @@ import { addIcons } from 'ionicons';
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss'],
   standalone: true,
-  imports: [IonicModule, NgIf],
+  imports: [IonLabel, IonItem, IonContent, IonPopover, IonIcon, IonButton, NgIf],
 })
 export class UserComponent {
   @ViewChild('userpopover', { static: false }) userpopover!: HTMLIonPopoverElement;
@@ -29,10 +29,7 @@ export class UserComponent {
 
   constructor(private router: Router, private popoverController: PopoverController, private loginService: LoginFireauthService) {
     loginService.listenForUserChanges(user => this.user = user)
-    addIcons({
-      'person': person,
-      'logoGoogle': logoGoogle
-    });
+    addIcons({ person, logoGoogle });
   }
 
 

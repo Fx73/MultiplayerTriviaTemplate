@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { AccountComponent } from './account.component';
-import { IonicModule } from '@ionic/angular';
 
 describe('AccountPage', () => {
   let component: AccountComponent;
@@ -10,7 +9,7 @@ describe('AccountPage', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [AccountComponent],
-      imports: [IonicModule.forRoot()]
+      imports: []
     }).compileComponents();
 
     fixture = TestBed.createComponent(AccountComponent);
