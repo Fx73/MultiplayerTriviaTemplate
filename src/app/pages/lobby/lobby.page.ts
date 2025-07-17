@@ -31,7 +31,6 @@ export class LobbyPage implements OnInit, OnDestroy {
   lobbyCode: string;
 
   categoryList: string[] = []
-  subcategoryList: string[] = []
 
   questionCount: number = 10;
 
@@ -97,19 +96,6 @@ export class LobbyPage implements OnInit, OnDestroy {
     this.lobbyService.changePlayerName(this.lobbyCode, this.gameInstance.playerName)
   }
 
-
-  async onCategorySelect(value: string | null) {
-    await this.lobbyService.updateLobby(this.lobbyCode, 'category', value)
-    if (value)
-      this.subcategoryList = await this.itemService.getSubcategories(value)
-  }
-  async onSubcategorySelect(value: string | null) {
-    await this.lobbyService.updateLobby(this.lobbyCode, 'subcategory', value)
-  }
-  async onQuestionCountChange(value: any) {
-    await this.lobbyService.updateLobby(this.lobbyCode, 'questionCount', value)
-  }
-
   async onLobbyValueModified(key: string, value: any) {
     await this.lobbyService.updateLobby(this.lobbyCode, key, value)
   }
@@ -117,7 +103,7 @@ export class LobbyPage implements OnInit, OnDestroy {
   async onStartPressed() {
     if (!this.gameInstance.lobby) return
     this.isLobbyLocked = true;
-    const questions = await this.itemService.getRandomQuestionIds(this.gameInstance.lobby.questionCount, this.gameInstance.lobby.category, this.gameInstance.lobby.subcategory)
+    const questions = await this.itemService.getRandomQuestionIds(this.gameInstance.lobby.questionCount, this.gameInstance.lobby.category)
 
     if (questions.length < this.gameInstance.lobby.questionCount) {
       this.isLobbyLocked = false;

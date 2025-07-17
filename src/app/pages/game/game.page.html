@@ -25,10 +25,7 @@
 				class="question-card">
 				<ion-card-header>
 					<ion-card-subtitle *ngIf="trivia.category">
-						{{ trivia.category }} > {{ trivia.subcategory }}
-					</ion-card-subtitle>
-					<ion-card-subtitle *ngIf="!trivia.category">
-						No category
+						{{ trivia.category }}
 					</ion-card-subtitle>
 					<ion-chip color="primary" class="chip-progress">
 						🎯 {{ gameInstance.lobby.questionList.length - gameInstance.lobby.questionCount + 1 }} /

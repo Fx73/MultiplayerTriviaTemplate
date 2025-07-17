@@ -38,8 +38,6 @@ export class ItemFirestoreService {
 
             if (dto.category) {
                 this.addCategory(dto.category);
-                if (dto.subcategory)
-                    this.addSubcategory(dto.category, dto.subcategory);
             }
         } catch (error) {
             dto.owner = undefined
@@ -65,21 +63,15 @@ export class ItemFirestoreService {
             const oldCat = oldData?.category;
             const newCat = dto.category;
 
-            const oldSub = oldData?.subcategory;
-            const newSub = dto.subcategory;
 
             if (newCat) {
                 this.addCategory(newCat);
-                if (newSub) this.addSubcategory(newCat, newSub);
             }
 
             if (oldCat && oldCat !== newCat) {
                 this.removeCategory(oldCat);
             }
 
-            if (oldCat && oldSub && (oldSub !== newSub || oldCat !== newCat)) {
-                this.removeSubcategory(oldCat, oldSub);
-            }
         } catch (error) {
             AppComponent.presentWarningToast("Error updating item: " + error);
             throw error;
@@ -171,16 +163,10 @@ export class ItemFirestoreService {
 
             const itemData = itemSnap.data();
             const category = itemData['category'];
-            const subcategory = itemData['subcategory'];
 
             await deleteDoc(itemRef);
             AppComponent.presentOkToast("Item successfully deleted!");
 
-            if (category) {
-                if (subcategory)
-                    this.removeSubcategory(category, subcategory);
-                this.removeCategory(category);
-            }
         } catch (error) {
             AppComponent.presentErrorToast("Error deleting item: " + error);
             throw error;
@@ -195,33 +181,39 @@ export class ItemFirestoreService {
     async getCategories(): Promise<string[]> {
         const ref = doc(this.db, this.METADATA_COLLECTION, this.CATEGORY_DOCUMENT);
         const snap = await getDoc(ref);
-        return Object.keys(snap.data()?.['category'] ?? {});
-    }
-    async getSubcategories(category: string): Promise<string[]> {
-        const ref = doc(this.db, this.METADATA_COLLECTION, this.CATEGORY_DOCUMENT);
-        const snap = await getDoc(ref);
-        return snap.data()?.['category']?.[category] ?? [];
-    }
 
-    async addCategory(category: string): Promise<void> {
-        const ref = doc(this.db, this.METADATA_COLLECTION, this.CATEGORY_DOCUMENT);
-        await setDoc(ref, {
-            category: { [category]: [] }
-        }, { merge: true });
-    }
-    async addSubcategory(category: string, subcategory: string): Promise<void> {
-        const ref = doc(this.db, this.METADATA_COLLECTION, this.CATEGORY_DOCUMENT);
-        const snap = await getDoc(ref);
         const data = snap.data();
-        const current = data?.['category']?.[category] ?? [];
 
-        if (!current.includes(subcategory)) {
-            const updated = [...current, subcategory];
-            await updateDoc(ref, {
-                [`category.${category}`]: updated
-            });
-        }
+        return data?.['category'];
     }
+
+
+    async addCategory(name: string): Promise<boolean> {
+        const cleaned = name?.trim();
+        if (!cleaned || cleaned.length === 0) {
+            AppComponent.presentErrorToast('Category is required and cannot be empty.');
+            return false;
+        }
+
+        const ref = doc(this.db, this.METADATA_COLLECTION, this.CATEGORY_DOCUMENT);
+        const snap = await getDoc(ref);
+        const existing = snap.data()?.['category'];
+
+        let categories: string[] = Array.isArray(existing) ? existing : [];
+
+        if (categories.includes(cleaned)) {
+            AppComponent.presentErrorToast(`⚠️ Category "${cleaned}" already exists.`);
+            return false;
+        }
+
+        categories.push(cleaned);
+
+        await setDoc(ref, { category: categories }, { merge: true });
+        AppComponent.presentOkToast(`✅ Category added: ${cleaned}`);
+        return true
+    }
+
+
     async removeCategory(category: string): Promise<void> {
         const triviaSnap = await getDocs(collection(this.db, 'trivia'));
         const stillUsed = triviaSnap.docs.some(doc => {
@@ -239,43 +231,18 @@ export class ItemFirestoreService {
             [`category.${category}`]: deleteField()
         });
     }
-    async removeSubcategory(category: string, subcategory: string): Promise<void> {
-        const triviaSnap = await getDocs(collection(this.db, 'trivia'));
-        const stillUsed = triviaSnap.docs.some(doc => {
-            const data = doc.data();
-            return data['category'] === category && data['subcategory'] === subcategory;
-        });
 
-        if (stillUsed) {
-            console.log(`Subcategory "${subcategory}" of "${category}" is still in use`);
-            return;
-        }
-
-        const ref = doc(this.db, this.METADATA_COLLECTION, this.CATEGORY_DOCUMENT);
-        const snap = await getDoc(ref);
-        const data = snap.data();
-        const current = data?.['category']?.[category] ?? [];
-
-        const updated = current.filter((item: string) => item !== subcategory);
-        await updateDoc(ref, {
-            [`category.${category}`]: updated
-        });
-    }
 
     //#endregion
 
     //#region Game
-    async getRandomQuestionIds(count: number, category: string | null = null, subcategory: string | null = null): Promise<string[]> {
+    async getRandomQuestionIds(count: number, category: string[] = []): Promise<string[]> {
         let queryRef = collection(this.db, this.TRIVIA_COLLECTION);
 
         const constraints: QueryConstraint[] = [];
 
-        if (category)
-            constraints.push(where('category', '==', category));
-
-        if (subcategory)
-            constraints.push(where('subcategory', '==', subcategory));
-
+        if (category && category.length > 0)
+            constraints.push(where('category', 'in', category));
 
         //Todo : Scale
         const querySnapshot = await getDocs(query(queryRef, ...constraints));

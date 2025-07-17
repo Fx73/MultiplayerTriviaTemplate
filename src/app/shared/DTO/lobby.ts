@@ -2,8 +2,7 @@ import { Timestamp } from "firebase/firestore"
 
 export class Lobby {
     host: string | null = null
-    category: string | null = null
-    subcategory: string | null = null
+    category: string[] = []
     questionCount: number = 10
     isTimed: boolean = true
     timerDuration = 60

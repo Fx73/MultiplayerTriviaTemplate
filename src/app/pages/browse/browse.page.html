@@ -15,39 +15,20 @@
         <ion-card-content>
           <ion-item [disabled]="selectedItem.owner && selectedItem.owner !== userId">
             <ion-label position="stacked">Category</ion-label>
-            <ion-select [(ngModel)]="selectedCategoryChoice" (ionChange)="onCategorySelect()" interface="popover"
+            <ion-select [(ngModel)]="selectedItem.category" (ionChange)="onCategorySelect()" interface="popover"
               placeholder="Choose or create">
-              <ion-select-option [value]="null">No category</ion-select-option>
-              <ion-select-option [value]="'__custom__'">Create new category</ion-select-option>
+              <ion-select-option [value]="'__custom_new_category__'">Create new category</ion-select-option>
               <ion-select-option *ngFor="let cat of categoryList" [value]="cat">
                 {{ cat }}
               </ion-select-option>
             </ion-select>
           </ion-item>
 
-          <ion-item *ngIf="selectedCategoryChoice === '__custom__'"
-            [disabled]="selectedItem.owner && selectedItem.owner !== userId">
+          <ion-item *ngIf="showNewCategory" [disabled]="selectedItem.owner && selectedItem.owner !== userId">
             <ion-input [(ngModel)]="selectedItem.category" placeholder="Enter new category"></ion-input>
+            <ion-button (click)="onCategoryAdd()">Add</ion-button>
           </ion-item>
 
-
-
-          <ion-item *ngIf="selectedCategoryChoice" [disabled]="selectedItem.owner && selectedItem.owner !== userId">
-            <ion-label position="stacked">Subcategory</ion-label>
-            <ion-select [(ngModel)]="selectedSubcategoryChoice" (ionChange)="onSubcategorySelect()" interface="popover"
-              placeholder="Choose or create">
-              <ion-select-option [value]="null">No subcategory</ion-select-option>
-              <ion-select-option [value]="'__custom__'">Create new subcategory</ion-select-option>
-              <ion-select-option *ngFor="let sub of subcategoryList" [value]="sub">
-                {{ sub }}
-              </ion-select-option>
-            </ion-select>
-          </ion-item>
-
-          <ion-item *ngIf="selectedSubcategoryChoice === '__custom__'"
-            [disabled]="selectedItem.owner && selectedItem.owner !== userId">
-            <ion-input [(ngModel)]="selectedItem.subcategory" placeholder="Enter new subcategory"></ion-input>
-          </ion-item>
 
           <ion-item [disabled]="selectedItem.owner !== undefined && selectedItem.owner !== userId">
             <ion-label position="stacked">Question</ion-label>
