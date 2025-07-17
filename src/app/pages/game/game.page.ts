@@ -1,6 +1,6 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonChip, IonCol, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonList, IonListHeader, IonMenu, IonMenuButton, IonRow, IonSplitPane, IonText, IonTitle, IonToolbar, ToastController } from '@ionic/angular/standalone';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonChip, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonList, IonListHeader, IonMenu, IonSplitPane, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 
 import { AppComponent } from 'src/app/app.component';
 import { FormsModule } from '@angular/forms';

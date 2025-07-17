@@ -1,4 +1,4 @@
-import { Firestore, QueryConstraint, addDoc, collection, deleteDoc, deleteField, doc, documentId, getDoc, getDocs, getFirestore, limit, orderBy, query, setDoc, startAfter, updateDoc, where } from 'firebase/firestore';
+import { Firestore, QueryConstraint, collection, deleteDoc, deleteField, doc, documentId, getDoc, getDocs, getFirestore, limit, orderBy, query, setDoc, startAfter, updateDoc, where } from 'firebase/firestore';
 
 import { AppComponent } from 'src/app/app.component';
 import { FirestoreConverter } from './firestore.converter';

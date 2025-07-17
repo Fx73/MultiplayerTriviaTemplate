@@ -5,7 +5,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { ItemFirestoreService } from 'src/app/services/firestore/item.firestore.service';
-import { Router } from '@angular/router';
 import { TriviaItemDTO } from 'src/app/shared/DTO/trivia-item.dto';
 import { UserConfigService } from 'src/app/services/userconfig.service';
 import { UserFirestoreService } from './../../services/firestore/user.firestore.service';

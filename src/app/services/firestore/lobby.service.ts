@@ -1,6 +1,5 @@
 import { DocumentReference, Firestore, Query, Timestamp, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, increment, onSnapshot, query, serverTimestamp, setDoc, updateDoc, where, writeBatch } from '@firebase/firestore';
 import { GameState, Lobby } from '../../shared/DTO/lobby';
-import { Observable, ReplaySubject, Subject } from 'rxjs';
 
 import { AppComponent } from '../../app.component';
 import { Injectable } from '@angular/core';

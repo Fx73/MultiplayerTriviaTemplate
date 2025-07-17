@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IonCard, IonCardContent, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonCard, IonCardContent, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { logoAngular, logoCss3, logoHtml5, logoIonic } from 'ionicons/icons';
 
 import { CommonModule } from '@angular/common';

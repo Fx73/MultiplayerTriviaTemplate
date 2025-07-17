@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IonAvatar, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonContent, IonHeader, IonImg, IonItem, IonLabel, IonText, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonContent, IonImg } from '@ionic/angular/standalone';
 
 import { AccountComponent } from "./account/account.component";
 import { CommonModule } from '@angular/common';
