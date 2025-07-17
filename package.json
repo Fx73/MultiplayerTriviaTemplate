@@ -31,10 +31,8 @@
     "@ionic/angular": "^8.0.0",
     "fastest-levenshtein": "^1.0.16",
     "ionicons": "^7.0.0",
-    "ngx-socket-io": "^4.9.1",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
+    "tslib": "^2.3.0"
   },
   "devDependencies": {
     "@angular-eslint/builder": "^20.1.1",
