@@ -24,4 +24,17 @@ Welcome to **Multiplayer Trivia Template**, a web application that challenges us
 | Firebase   | Game synch                        |
 | SCSS       | Styling                           |
 
-## 📁 Project Structure
+## 📁 Run the app yourself
+
+### Run locally
+```bash
+ npm install
+ ionic serve
+```
+### Build & publish
+```bash
+ npm install
+ npm run ionic-build-prod
+ cd website
+ firebase deploy
+```
