@@ -1,13 +1,11 @@
-import { Component, NgZone, OnInit } from '@angular/core';
-import { IonBadge, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader, IonImg, IonInput, IonItem, IonLabel, IonRow, IonText, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { Component, OnInit } from '@angular/core';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonInput, IonRow } from '@ionic/angular/standalone';
 import { Router, RouterModule } from '@angular/router';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
-import { LobbyService } from 'src/app/services/firestore/lobby.service';
 import { LoginComponent } from "../../shared/user/login/login.component";
-import { UserConfigService } from 'src/app/services/userconfig.service';
 import { UserDto } from '../user-profile/user.dto';
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
 import { generateAlphaNumCode } from 'src/app/shared/util';

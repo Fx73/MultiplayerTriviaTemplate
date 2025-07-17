@@ -1,12 +1,13 @@
 import { ActivatedRoute, Router } from '@angular/router';
-import { CUSTOM_ELEMENTS_SCHEMA, Component, OnDestroy, OnInit } from '@angular/core';
-import { GameState, Lobby } from '../../shared/DTO/lobby';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonInput, IonItem, IonRange, IonRow, IonSelect, IonSelectOption, IonToggle } from "@ionic/angular/standalone";
 import { clipboard, helpCircleOutline } from 'ionicons/icons';
 
 import { AppComponent } from 'src/app/app.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GameInstance } from './../../services/game.instance';
+import { GameState } from '../../shared/DTO/lobby';
 import { HeaderComponent } from 'src/app/shared/component/header/header.component';
 import { ItemFirestoreService } from 'src/app/services/firestore/item.firestore.service';
 import { LobbyService } from 'src/app/services/firestore/lobby.service';
@@ -21,8 +22,7 @@ import { addIcons } from 'ionicons';
   templateUrl: './lobby.page.html',
   styleUrls: ['./lobby.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, HeaderComponent, PlayersCardComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  imports: [IonSelect, IonRange, IonCardContent, IonRow, IonContent, IonGrid, IonButton, IonIcon, IonCardTitle, IonCardHeader, IonCard, IonCol, IonInput, IonToggle, IonItem, CommonModule, FormsModule, HeaderComponent, PlayersCardComponent, IonSelectOption],
 })
 export class LobbyPage implements OnInit, OnDestroy {
   get gameInstance(): GameInstance { return AppComponent.gameInstance }
@@ -40,7 +40,7 @@ export class LobbyPage implements OnInit, OnDestroy {
   private stateSub!: Subscription;
 
   constructor(private route: ActivatedRoute, private router: Router, private userConfigService: UserConfigService, private itemService: ItemFirestoreService, private lobbyService: LobbyService) {
-    addIcons({ clipboard, helpCircleOutline })
+    addIcons({ clipboard, helpCircleOutline });
     lobbyService.cleanLobbyDB()
 
     this.lobbyCode = this.route.snapshot.paramMap.get('code') ?? ""
