@@ -1,6 +1,7 @@
 ion-content{
     --background: 
-    linear-gradient(rgba(155,112,112,0.8), rgba(112,112,112,0.4))}
+    linear-gradient(rgba(155,112,112,0.8), rgba(112,112,112,0.4))
+}
 
 .home-content{
   --border-radius : 20px;
@@ -14,6 +15,13 @@ ion-content{
 
 }
 
+.card-container{
+  border:solid;
+  margin-left:5%;
+  margin-right:5%;
+  margin-bottom: 5%;
+}
+
 .welcome-start-card{
   background:     linear-gradient(rgba(255, 212, 212, 0.8), rgba(252, 30, 30, 0.4));
 }
@@ -24,4 +32,39 @@ ion-content{
   opacity: 0.8;
   filter: blur(1px) contrast(110%);
   box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-areas:
+    "a a a b b"
+    "a a a b b"
+    "a a a c c";
+  grid-template-columns: repeat(5, 1fr);
+  transition: all 0.3s ease-in-out;
+}
+@media screen and (max-width: 900px) {
+  .layout-grid {
+    grid-template-areas:
+      "a a a"
+      "a a a"
+      "a a a"
+      "b b b"
+      "b b b"
+      "c c c";
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+
+.block-welcome {
+  grid-area: a;
+}
+
+.block-user {
+  grid-area: b;
+}
+
+.block-login {
+  grid-area: c;
 }

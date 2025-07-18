@@ -2,7 +2,7 @@
 	<ion-card-header *ngIf="!isSmall">
 		<ion-card-title>Login / Register</ion-card-title>
 	</ion-card-header>
-	<ion-card-content [style.height]="isSmall ? '30vh' : '44vh'">
+	<ion-card-content [style.height]="isSmall ? '30vh' : '40vh'">
 		<ion-tabs>
 			<ion-tab-bar slot="top" [ngClass]="{'small-tab-bar': isSmall}">
 				<ion-tab-button tab="third-party-credentials" [ngClass]="{'small-tab-button': isSmall}">
@@ -26,9 +26,11 @@
 			<!-- THIRD PARTY CREDENTIALS -->
 			<ion-tab tab="third-party-credentials">
 				<ion-card id="third-party-credentials-page">
-					<ion-title>
-						Use a Third-party credential
-					</ion-title>
+					<ion-card-header>
+						<ion-card-title>
+							Use a Third-party credential
+						</ion-card-title>
+					</ion-card-header>
 					<ion-card-content>
 						<ion-button (click)="loginWithGoogle()" icon-right expand="block" fill="outline" shape="round"
 							color="primary">

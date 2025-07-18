@@ -5,28 +5,31 @@
 </ion-header>
 
 <ion-content>
-	<ion-split-pane when="xs" contentId="questionTab">
-		<ion-menu contentId="questionTab">
+	<ion-split-pane when="md" contentId="questionTab">
+		<ion-menu contentId="questionTab" class="menu-slim">
 			<ion-header>
 				<ion-button
 					*ngIf="gameInstance.isOwner && (!gameInstance.lobby.isTimed && gameInstance.lobby.state === GameState.GameQuestion) || gameInstance.lobby.state === GameState.GameAnswer"
-					expand="block" size="large" color="warning" class="btn-next" (click)="onNextPressed()">
+					expand="block" size="large" color="warning" style="margin: 10px" (click)="onNextPressed()">
 					{{gameInstance.lobby.state === 1 ? 'End time' : 'Next'}}
 				</ion-button>
 				<app-players-card [players]="gameInstance.players" [ownerId]="gameInstance.lobby.host"
 					[isCurrentlyOwner]="gameInstance.isOwner"
 					(eventKickPlayer)="gameInstance.onKickPlayer($event)"></app-players-card>
 			</ion-header>
-
 		</ion-menu>
 		<div id="questionTab" class="question-tab">
 			<ion-card
 				*ngIf="trivia && (gameInstance.lobby.state === GameState.GameQuestion || gameInstance.lobby.state === GameState.GameAnswer)"
 				class="question-card">
 				<ion-card-header>
-					<ion-card-subtitle *ngIf="trivia.category">
+					<ion-card-subtitle>
 						{{ trivia.category }}
 					</ion-card-subtitle>
+
+					<ion-button class="menu-toggle-btn" (click)="openMenu()">
+						<ion-icon slot="icon-only" name="menu-outline"></ion-icon>
+					</ion-button>
 					<ion-chip color="primary" class="chip-progress">
 						🎯 {{ gameInstance.lobby.questionList.length - gameInstance.lobby.questionCount + 1 }} /
 						{{ gameInstance.lobby.questionList.length }}

@@ -1,84 +1,80 @@
 <app-header title="Welcome into the Lobby"></app-header>
-<ion-content [fullscreen]="true">
-	<ion-grid>
-		<ion-row>
-			<ion-col>
-				<ion-card class="cardContainer">
-					<ion-card-header>
-						<ion-card-title>Your lobby code :</ion-card-title>
-						<ion-input [value]="lobbyCode" aria-label="Code" labelPlacement="stacked" fill="outline"
-							style="text-transform: uppercase;" readonly></ion-input>
-						<ion-icon (click)="copyToClipboard()" size="large" class="lobbyCodeItem"
-							name="clipboard"></ion-icon>
-						<ion-card-title>Set your name !</ion-card-title>
-						<ion-input [(ngModel)]="gameInstance.playerName" label="You are :" fill="outline"
-							label-placement="floating" [disabled]="isLobbyLocked">
-						</ion-input>
-						<ion-button (click)="updateName()" class="okBtn" [disabled]="isLobbyLocked">
-							OK
-						</ion-button>
-					</ion-card-header>
-				</ion-card>
-			</ion-col>
-			<ion-col>
-				<app-players-card [players]="gameInstance.players" [ownerId]="gameInstance.lobby.host"
-					[isCurrentlyOwner]="gameInstance.isOwner"
-					(eventKickPlayer)="gameInstance.onKickPlayer($event)"></app-players-card>
-			</ion-col>
-			<ion-col>
-				<ion-card class="cardContainer">
-					<ion-card-header>
-						<ion-card-title>Categories</ion-card-title>
-					</ion-card-header>
-					<ion-card-content class="cardListCentered">
-						<ion-item>
-							<ion-input label="Question count" type="number" [value]="gameInstance.lobby.questionCount"
-								(ionChange)="onLobbyValueModified('questionCount',$event.target.value)"
-								placeholder="ex: 10" min="1" max="50" inputmode="numeric" [disabled]="isLobbyLocked">
-							</ion-input>
-						</ion-item>
-						<ion-item>
-							<ion-toggle [checked]="gameInstance.lobby.isTimed"
-								(ionChange)="onLobbyValueModified('isTimed',$event.detail.checked)" color="tertiary">
-								{{gameInstance.lobby.isTimed ? 'Timer Mode' : 'Manual Mode'}}
-							</ion-toggle>
-						</ion-item>
-						<ion-item *ngIf="gameInstance.lobby.isTimed">
-							<ion-input label="Timer (seconds)" labelPlacement="stacked" type="number"
-								[value]="gameInstance.lobby.timerDuration"
-								(ionChange)="onLobbyValueModified('timerDuration',$event.target.value)" min="10"
-								max="600" placeholder="e.g. 60"></ion-input>
-						</ion-item>
-						<ion-item>
-							<ion-label>Flexibility : {{gameInstance.lobby.answerStrictness}}
-								{{ gameInstance.lobby.answerStrictness === 0 ? '(strict)' : ''}}
-							</ion-label>
-							<ion-range aria-label="Flexibility Level" label-placement="fixed" [ticks]="true"
-								[snaps]="true" [min]="0" [max]="5" [pin]="true" [pinFormatter]="pinFormatter"
-								[value]="gameInstance.lobby.answerStrictness"
-								(ionChange)="onLobbyValueModified('answerStrictness',$event.detail.value)"></ion-range>
-							<ion-icon slot="end" name="help-circle-outline"
-								title="Answer flexibility level. If you're unsure, pick 2 for one letter swap allowed"></ion-icon>
-						</ion-item>
+<ion-content>
+	<div class="layout-grid">
+		<ion-card class="base-card block-lobby">
+			<ion-card-header>
+				<ion-card-title>Your lobby code :</ion-card-title>
+				<ion-input [value]="lobbyCode" aria-label="Code" labelPlacement="stacked" fill="outline"
+					style="text-transform: uppercase;" readonly></ion-input>
+				<ion-icon (click)="copyToClipboard()" size="large" class="lobbyCodeItem" name="clipboard"></ion-icon>
+			</ion-card-header>
+			<ion-card-content>
+				<ion-card-subtitle>Set your name !</ion-card-subtitle>
+				<ion-input [(ngModel)]="gameInstance.playerName" label="You are :" fill="outline"
+					label-placement="floating" [disabled]="isLobbyLocked">
+					<ion-button (click)="updateName()" class="okBtn" [disabled]="isLobbyLocked">
+						OK
+					</ion-button>
+				</ion-input>
 
-						<ion-item>
-							<ion-select label="Categories" [value]="gameInstance.lobby.category"
-								(ionChange)="onLobbyValueModified('category', $event.detail.value)" interface="popover"
-								multiple="true" placeholder="No category" [disabled]="isLobbyLocked">
-								<ion-select-option *ngFor="let category of categoryList" [value]="category">
-									{{ category }}
-								</ion-select-option>
-							</ion-select>
-						</ion-item>
+			</ion-card-content>
+		</ion-card>
 
-						<ion-button [disabled]="!gameInstance.isOwner || isLobbyLocked" size="large" fill="outline"
-							expand="block" style="margin-top: 10px;" (click)="onStartPressed()">
-							Launch
-						</ion-button>
-					</ion-card-content>
-				</ion-card>
-			</ion-col>
+		<ion-card class="base-card block-players">
+			<app-players-card [players]="gameInstance.players" [ownerId]="gameInstance.lobby.host"
+				[isCurrentlyOwner]="gameInstance.isOwner"
+				(eventKickPlayer)="gameInstance.onKickPlayer($event)"></app-players-card>
+		</ion-card>
+		<ion-card class="base-card block-options">
+			<ion-card-header>
+				<ion-card-title>Lobby Settings</ion-card-title>
+			</ion-card-header>
+			<ion-card-content>
+				<ion-item>
+					<ion-input label="Question count" type="number" [value]="gameInstance.lobby.questionCount"
+						(ionChange)="onLobbyValueModified('questionCount',$event.target.value)" placeholder="ex: 10"
+						min="1" max="50" inputmode="numeric" [disabled]="isLobbyLocked">
+					</ion-input>
+				</ion-item>
+				<ion-item>
+					<ion-toggle [checked]="gameInstance.lobby.isTimed"
+						(ionChange)="onLobbyValueModified('isTimed',$event.detail.checked)" color="tertiary">
+						{{gameInstance.lobby.isTimed ? 'Timer Mode' : 'Manual Mode'}}
+					</ion-toggle>
+				</ion-item>
+				<ion-item *ngIf="gameInstance.lobby.isTimed">
+					<ion-input label="Timer (seconds)" labelPlacement="stacked" type="number"
+						[value]="gameInstance.lobby.timerDuration"
+						(ionChange)="onLobbyValueModified('timerDuration',$event.target.value)" min="10" max="600"
+						placeholder="e.g. 60"></ion-input>
+				</ion-item>
+				<ion-item>
+					<ion-label>Flexibility : {{gameInstance.lobby.answerStrictness}}
+						{{ gameInstance.lobby.answerStrictness === 0 ? '(strict)' : ''}}
+					</ion-label>
+					<ion-range aria-label="Flexibility Level" label-placement="fixed" [ticks]="true" [snaps]="true"
+						[min]="0" [max]="5" [pin]="true" [pinFormatter]="pinFormatter"
+						[value]="gameInstance.lobby.answerStrictness"
+						(ionChange)="onLobbyValueModified('answerStrictness',$event.detail.value)"></ion-range>
+					<ion-icon slot="end" name="help-circle-outline"
+						title="Answer flexibility level. If you're unsure, pick 2 for one letter swap allowed"></ion-icon>
+				</ion-item>
 
-		</ion-row>
-	</ion-grid>
+				<ion-item>
+					<ion-select label="Categories" [value]="gameInstance.lobby.category"
+						(ionChange)="onLobbyValueModified('category', $event.detail.value)" interface="popover"
+						multiple="true" placeholder="No category" [disabled]="isLobbyLocked">
+						<ion-select-option *ngFor="let category of categoryList" [value]="category">
+							{{ category }}
+						</ion-select-option>
+					</ion-select>
+				</ion-item>
+
+				<ion-button [disabled]="!gameInstance.isOwner || isLobbyLocked" size="large" fill="outline"
+					expand="block" style="margin-top: 10px;" (click)="onStartPressed()">
+					Launch
+				</ion-button>
+			</ion-card-content>
+		</ion-card>
+	</div>
 </ion-content>

@@ -1,32 +1,23 @@
-hr {
-  margin-top: 4px;
-  border-top: 1px double #777777;
-  width: 40%;
-}
-
-ion-col{
-  padding: 0;
-}
-
-.cardContainer{
-  padding: 2px;
-  margin: 6px;
-}
-
+// BLock User
 .okBtn{
   position: relative;
-  top: -52px;
-  margin-bottom: -52px;
+  top: -8px;
+  right: -12vw;
+  margin-bottom: -80px;
   width: 40px;
   height: 40px;
   align-self: flex-end;
-  right: 4px;
   z-index: 2;
 }
-
-.scrollBlock{
-  overflow-y: scroll;
-  max-height: 60vh ;
+@media screen and (max-width: 600px) {
+  .okBtn{
+      right: -38vw;
+  }
+}
+@media screen and (min-width: 601px) and (max-width: 1200px) {
+    .okBtn{
+      right: -26vw;
+  }
 }
 
 .lobbyCodeItem{
@@ -35,8 +26,56 @@ ion-col{
     top:50px;
     z-index: 2;
     cursor: pointer;
-
 }
+
+
+// Global Layout
+.layout-grid {
+  display: grid;
+  grid-template-areas:
+    "a a b b c c c"
+    "a a b b c c c"
+    "a a b b c c c";
+  grid-template-columns: repeat(6, 1fr);
+  transition: all 0.3s ease-in-out;
+}
+@media screen and (max-width: 600px) {
+  .layout-grid {
+    grid-template-areas:
+      "a a a"
+      "b b b"
+      "c c c";
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media screen and (min-width: 601px) and (max-width: 1200px) {
+  .layout-grid {
+    grid-template-areas:
+      "b a a"
+      "b a a"
+      "b c c"
+      "b c c";
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.block-lobby {
+  grid-area: a;
+}
+.block-players {
+  grid-area: b;
+}
+.block-options {
+  grid-area: c;
+}
+
+
+
+
+
+
+
+
+
 
 
 ion-radio::part(container) {

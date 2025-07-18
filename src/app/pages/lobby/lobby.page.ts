@@ -1,6 +1,6 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonInput, IonItem, IonLabel, IonRange, IonRow, IonSelect, IonSelectOption, IonToggle } from "@ionic/angular/standalone";
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonInput, IonItem, IonLabel, IonRange, IonSelect, IonSelectOption, IonToggle } from "@ionic/angular/standalone";
 import { clipboard, helpCircleOutline } from 'ionicons/icons';
 
 import { AppComponent } from 'src/app/app.component';
@@ -22,7 +22,7 @@ import { addIcons } from 'ionicons';
   templateUrl: './lobby.page.html',
   styleUrls: ['./lobby.page.scss'],
   standalone: true,
-  imports: [IonLabel, IonSelect, IonRange, IonCardContent, IonRow, IonContent, IonGrid, IonButton, IonIcon, IonCardTitle, IonCardHeader, IonCard, IonCol, IonInput, IonToggle, IonItem, CommonModule, FormsModule, HeaderComponent, PlayersCardComponent, IonSelectOption],
+  imports: [IonCardSubtitle, IonLabel, IonSelect, IonRange, IonCardContent, IonContent, IonButton, IonIcon, IonCardTitle, IonCardHeader, IonCard, IonInput, IonToggle, IonItem, CommonModule, FormsModule, HeaderComponent, PlayersCardComponent, IonSelectOption],
 })
 export class LobbyPage implements OnInit, OnDestroy {
   get gameInstance(): GameInstance { return AppComponent.gameInstance }

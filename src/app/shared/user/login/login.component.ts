@@ -13,7 +13,7 @@ import { addIcons } from 'ionicons';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [IonInput, IonItem, IonLabel, IonTitle, IonCardSubtitle, IonTab, IonCard, IonButton, IonTabs, IonCardContent, IonCardTitle, IonIcon, IonCardHeader, CommonModule, FormsModule, ReactiveFormsModule, RouterModule, NgIf],
+  imports: [IonInput, IonItem, IonLabel, IonCardSubtitle, IonTab, IonCard, IonButton, IonTabs, IonCardContent, IonCardTitle, IonIcon, IonCardHeader, CommonModule, FormsModule, ReactiveFormsModule, RouterModule, NgIf],
 })
 export class LoginComponent {
   @Input()

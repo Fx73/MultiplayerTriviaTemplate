@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonInput, IonRow } from '@ionic/angular/standalone';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInput } from '@ionic/angular/standalone';
 import { Router, RouterModule } from '@angular/router';
 
 import { CommonModule } from '@angular/common';
@@ -15,7 +15,7 @@ import { generateAlphaNumCode } from 'src/app/shared/util';
   templateUrl: './welcome.page.html',
   styleUrls: ['./welcome.page.scss'],
   standalone: true,
-  imports: [IonInput, IonCol, IonRow, IonGrid, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonCard, IonButton, IonContent, CommonModule, FormsModule, HeaderComponent, RouterModule, LoginComponent, IonCardSubtitle]
+  imports: [IonInput, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonCard, IonButton, IonContent, CommonModule, FormsModule, HeaderComponent, RouterModule, LoginComponent, IonCardSubtitle]
 })
 export class WelcomePage implements OnInit {
   userData: UserDto | null = null;

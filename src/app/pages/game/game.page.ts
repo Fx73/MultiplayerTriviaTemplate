@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonChip, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonList, IonListHeader, IonMenu, IonSplitPane, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonChip, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonListHeader, IonMenu, IonSplitPane, IonTitle, IonToolbar, MenuController } from '@ionic/angular/standalone';
 
 import { AppComponent } from 'src/app/app.component';
 import { FormsModule } from '@angular/forms';
@@ -14,14 +14,16 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { TriviaItemDTO } from 'src/app/shared/DTO/trivia-item.dto';
 import { UserConfigService } from "src/app/services/userconfig.service";
+import { addIcons } from 'ionicons';
 import { distance } from 'fastest-levenshtein';
+import { menuOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-game',
   templateUrl: './game.page.html',
   styleUrls: ['./game.page.scss'],
   standalone: true,
-  imports: [IonListHeader, IonList, IonChip, IonSplitPane, IonItem, IonInput, IonLabel, IonCardSubtitle, IonCardTitle, IonCardHeader, IonButton, IonCardContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonContent, IonCard, PlayersCardComponent, IonMenu]
+  imports: [IonIcon, IonListHeader, IonList, IonChip, IonSplitPane, IonItem, IonInput, IonLabel, IonCardSubtitle, IonCardTitle, IonCardHeader, IonButton, IonCardContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonContent, IonCard, PlayersCardComponent, IonMenu]
 })
 export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   GameState = GameState
@@ -36,7 +38,9 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   private stateSub?: Subscription;
   private allReadySub?: Subscription;
 
-  constructor(private lobbyService: LobbyService, private userConfigService: UserConfigService, private itemFirestoreService: ItemFirestoreService, private location: Location, private router: Router) { }
+  constructor(private lobbyService: LobbyService, private userConfigService: UserConfigService, private itemFirestoreService: ItemFirestoreService, private location: Location, private menu: MenuController) {
+    addIcons({ menuOutline });
+  }
 
 
   ngOnInit() {
@@ -92,6 +96,8 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
 
     if (state === GameState.GameAnswer) {
+      if (!this.trivia)
+        this.loadCurrentQuestion();
       const audio = new Audio('assets/Sound/trombone.wav');
       audio.play();
       this.clearCountdown();
@@ -221,6 +227,9 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.location.historyGo(-2);
   }
 
+  openMenu() {
+    this.menu.open();
+  }
   //#endregion
 }
 
