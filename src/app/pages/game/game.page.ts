@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonChip, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonListHeader, IonMenu, IonSplitPane, IonTitle, IonToolbar, MenuController } from '@ionic/angular/standalone';
 
@@ -40,6 +40,11 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(private lobbyService: LobbyService, private userConfigService: UserConfigService, private itemFirestoreService: ItemFirestoreService, private location: Location, private menu: MenuController) {
     addIcons({ menuOutline });
+  }
+
+  @HostListener('document:keydown.enter', ['$event'])
+  handleEnter(event: KeyboardEvent) {
+    this.submitAnswer();
   }
 
 
