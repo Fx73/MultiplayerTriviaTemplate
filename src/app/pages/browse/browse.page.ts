@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { InfiniteScrollCustomEvent, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonInput, IonItem, IonLabel, IonMenu, IonSearchbar, IonSelect, IonSelectOption, IonSplitPane, IonTextarea, MenuController } from '@ionic/angular/standalone';
+import { InfiniteScrollCustomEvent, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonInput, IonItem, IonLabel, IonMenu, IonSearchbar, IonSelect, IonSelectOption, IonSpinner, IonSplitPane, IonTextarea, MenuController } from '@ionic/angular/standalone';
 
 import { AppComponent } from 'src/app/app.component';
 import { CommonModule } from '@angular/common';
@@ -16,10 +16,11 @@ import { addIcons } from 'ionicons';
   templateUrl: './browse.page.html',
   styleUrls: ['./browse.page.scss'],
   standalone: true,
-  imports: [IonIcon, IonLabel, IonItem, IonTextarea, IonButton, IonSplitPane, IonCardSubtitle, IonMenu, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonInfiniteScroll, IonSearchbar, IonSelect, IonSelectOption, IonCard, IonCardHeader, IonInput, IonContent, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonSpinner, IonIcon, IonLabel, IonItem, IonTextarea, IonButton, IonSplitPane, IonCardSubtitle, IonMenu, IonCardContent, IonCardTitle, IonSearchbar, IonSelect, IonSelectOption, IonCard, IonCardHeader, IonInput, IonContent, CommonModule, FormsModule, HeaderComponent]
 })
 export class BrowsePage implements OnInit {
   searchQuery: string = ''
+  isLoadingItems: Boolean = false
 
   items: TriviaItemDTO[] = []
   categoryList: string[] = []
@@ -43,6 +44,10 @@ export class BrowsePage implements OnInit {
   }
 
   async updateItems(lastItemId: string | null, resetList = false) {
+    if (this.isLoadingItems)
+      return;
+    this.isLoadingItems = true
+
     const newItems: TriviaItemDTO[] = await this.itemFirestoreService.GetAllItems(lastItemId, this.searchQuery);
 
     if (resetList)
@@ -61,6 +66,8 @@ export class BrowsePage implements OnInit {
         this.ownerNameList.set(id, name);
       });
     }
+
+    this.isLoadingItems = false
   }
 
 
@@ -138,7 +145,20 @@ export class BrowsePage implements OnInit {
     this.updateItems(null, true)
   }
 
+
+  onScroll(event: any) {
+    const threshold = 100; // marge avant la fin
+    const position = event.target.scrollTop + event.target.offsetHeight;
+    const height = event.target.scrollHeight;
+
+    if (position > height - threshold) {
+      this.onIonInfinite(null!)
+
+    }
+  }
+
   onIonInfinite(event: InfiniteScrollCustomEvent) {
+    console.log("POUT")
     this.updateItems(this.items.at(-1)?.id ?? null)
   }
 

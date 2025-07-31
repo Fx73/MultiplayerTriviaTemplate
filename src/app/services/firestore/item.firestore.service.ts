@@ -36,9 +36,7 @@ export class ItemFirestoreService {
 
             AppComponent.presentOkToast("Trivia successfully uploaded!")
 
-            if (dto.category) {
-                this.addCategory(dto.category);
-            }
+
         } catch (error) {
             dto.owner = undefined
             AppComponent.presentWarningToast("Error uploading music: " + error)
@@ -58,20 +56,6 @@ export class ItemFirestoreService {
             await setDoc(itemRef, dto);
 
             AppComponent.presentOkToast("Item successfully updated!");
-
-            // 🔍 Category
-            const oldCat = oldData?.category;
-            const newCat = dto.category;
-
-
-            if (newCat) {
-                this.addCategory(newCat);
-            }
-
-            if (oldCat && oldCat !== newCat) {
-                this.removeCategory(oldCat);
-            }
-
         } catch (error) {
             AppComponent.presentWarningToast("Error updating item: " + error);
             throw error;

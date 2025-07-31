@@ -57,7 +57,7 @@
     <div id="item-list">
       <ion-searchbar [debounce]="1000" (ionInput)="onSearch($event)" show-clear-button="focus"
         style="background-color:white"></ion-searchbar>
-      <div style="height: 95%;overflow-y: scroll;">
+      <div style="height: 95%;overflow-y: scroll;" (scroll)="onScroll($event)">
         <div class="grid-card">
           <ion-card class="card-item" (click)="onAddNewItem()">
             <ion-card-header>
@@ -82,11 +82,10 @@
             </ion-card-content>
           </ion-card>
         </div>
+        <div *ngIf="isLoadingItems">
+          <ion-spinner name="dots"></ion-spinner>
+        </div>
       </div>
-      <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
-        <ion-infinite-scroll-content></ion-infinite-scroll-content>
-      </ion-infinite-scroll>
-
     </div>
   </ion-split-pane>
 </ion-content>
