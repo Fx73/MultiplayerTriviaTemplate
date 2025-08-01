@@ -108,7 +108,7 @@ export class ItemFirestoreService {
         return items;
     }
 
-    async GetAllItems(lastItemId: string | null, searchTerm?: string): Promise<TriviaItemDTO[]> {
+    async GetAllItems(lastItemId: string | null, selectedCategories: string[] = [], searchTerm?: string): Promise<TriviaItemDTO[]> {
         const itemRef = collection(this.db, this.TRIVIA_COLLECTION).withConverter(this.firestoreConverterTriviaItem);
         const constraints: QueryConstraint[] = [];
 
@@ -116,6 +116,12 @@ export class ItemFirestoreService {
         if (searchTerm) {
             constraints.push(where('answer', '>=', searchTerm));
             constraints.push(where('answer', '<', searchTerm + 'z'));
+        }
+
+        // 🗂️ Optional category filter
+        if (selectedCategories.length > 0) {
+            // Firestore 'in' supports max 10 values
+            constraints.push(where('category', 'in', selectedCategories.slice(0, 10)));
         }
 
         // 📍 Pagination setup

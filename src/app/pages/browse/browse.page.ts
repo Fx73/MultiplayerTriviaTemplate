@@ -20,6 +20,7 @@ import { addIcons } from 'ionicons';
 })
 export class BrowsePage implements OnInit {
   searchQuery: string = ''
+  categoryQuery: string[] = []
   isLoadingItems: Boolean = false
 
   items: TriviaItemDTO[] = []
@@ -48,7 +49,7 @@ export class BrowsePage implements OnInit {
       return;
     this.isLoadingItems = true
 
-    const newItems: TriviaItemDTO[] = await this.itemFirestoreService.GetAllItems(lastItemId, this.searchQuery);
+    const newItems: TriviaItemDTO[] = await this.itemFirestoreService.GetAllItems(lastItemId, this.categoryQuery, this.searchQuery);
 
     if (resetList)
       this.items = newItems
@@ -145,6 +146,12 @@ export class BrowsePage implements OnInit {
     this.updateItems(null, true)
   }
 
+  onSearchCategory(categories: string[]) {
+    if (categories.length > 10) {
+      AppComponent.presentErrorToast("Cannot have more than 10 categories")
+    }
+    this.updateItems(null, true)
+  }
 
   onScroll(event: any) {
     const threshold = 100; // marge avant la fin

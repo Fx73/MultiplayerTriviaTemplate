@@ -55,8 +55,16 @@
       </ion-card>
     </ion-menu>
     <div id="item-list">
-      <ion-searchbar [debounce]="1000" (ionInput)="onSearch($event)" show-clear-button="focus"
-        style="background-color:white"></ion-searchbar>
+      <ion-item class="item-search">
+        <ion-searchbar [debounce]="1000" (ionInput)="onSearch($event)" show-clear-button="focus"
+          style="background-color:white"></ion-searchbar>
+        <ion-select [(ngModel)]="categoryQuery" (ionChange)="onSearchCategory($event.detail.value)" interface="popover"
+          multiple="true" placeholder="All categories">
+          <ion-select-option *ngFor="let category of categoryList" [value]="category">
+            {{ category }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
       <div style="height: 95%;overflow-y: scroll;" (scroll)="onScroll($event)">
         <div class="grid-card">
           <ion-card class="card-item" (click)="onAddNewItem()">

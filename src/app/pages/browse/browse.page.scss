@@ -1,3 +1,12 @@
+.item-search{
+  --padding: 0;
+  ion-select{
+    margin-left : 12px;
+    width: 120px;
+    min-width: 120px;
+  }
+}
+
 .grid-card{
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
